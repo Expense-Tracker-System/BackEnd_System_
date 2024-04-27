@@ -1,4 +1,7 @@
-﻿using backend_dotnet7.Core.Entities;
+﻿using backend_dotnet7.Core.Dtos.AddTran;
+using backend_dotnet7.Core.Entities;
+using backend_dotnet7.Core.Entities.AddTrEntity;
+using backend_dotnet7.Core.Entities.CreateServing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,12 +10,17 @@ namespace backend_dotnet7.Core.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> //generic type
     {
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
         public DbSet<Log> Logs { get; set; }
         public DbSet<Message> Messages { get; set; }
+
+        public DbSet<ExpenseEntity> ExpenseEntitys{ get; set; } // DbSet for ExpenseEntity
+        public DbSet<ServingEntity> Servings { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
