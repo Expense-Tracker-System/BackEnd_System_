@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using backend_dotnet7.Core.Entities.AddTrEntity;
+using backend_dotnet7.Core.Entities.AddTrEntity; // Assuming there's an IncomeEntity class in this namespace
 using backend_dotnet7.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,17 +9,17 @@ namespace ExpenseTracker.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ExpenseController : ControllerBase
+    public class IncomeController : ControllerBase
     {
-        private readonly IExpenseService _expenseService;
+        private readonly IIncomeService _incomeService;
 
-        public ExpenseController(IExpenseService expenseService)
+        public IncomeController(IIncomeService incomeService)
         {
-            _expenseService = expenseService;
+            _incomeService = incomeService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddExpense([FromBody] IncomeEntity expenseEntity)
+        public async Task<IActionResult> AddIncome([FromBody] IncomeEntity incomeEntity)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace ExpenseTracker.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var result = await _expenseService.AddExpense(expenseEntity);
+                var result = await _incomeService.AddIncome(incomeEntity);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -39,12 +39,12 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetExpenses()
+        public IActionResult GetIncomes()
         {
             try
             {
-                var expenses = _expenseService.GetExpenses();
-                return Ok(expenses);
+                var incomes = _incomeService.GetIncomes();
+                return Ok(incomes);
             }
             catch (Exception ex)
             {
@@ -54,17 +54,17 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetExpenseById(int id)
+        public async Task<IActionResult> GetIncomeById(int id)
         {
             try
             {
-                var expense = await _expenseService.GetExpenseById(id);
-                if (expense == null)
+                var income = await _incomeService.GetIncomeById(id);
+                if (income == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(expense);
+                return Ok(income);
             }
             catch (Exception ex)
             {
@@ -74,11 +74,11 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteExpense(int id)
+        public IActionResult DeleteIncome(int id)
         {
             try
             {
-                var deleted = _expenseService.DeleteExpense(id);
+                var deleted = _incomeService.DeleteIncome(id);
                 if (!deleted)
                 {
                     return NotFound();

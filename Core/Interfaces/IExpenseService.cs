@@ -6,9 +6,9 @@ namespace backend_dotnet7.Core.Interfaces
 {
     public interface IExpenseService
     {
-        Task<ExpenseEntity> AddExpense(ExpenseEntity expense);
-        IEnumerable<ExpenseEntity> GetExpenses();
+        Task<IncomeEntity> AddExpense(IncomeEntity expense);
+        IEnumerable<IncomeEntity> GetExpenses();
         bool DeleteExpense(int id);
-        Task<ExpenseEntity> GetExpenseById(int id);
+        Task<IncomeEntity> GetExpenseById(int id);
     }
 }

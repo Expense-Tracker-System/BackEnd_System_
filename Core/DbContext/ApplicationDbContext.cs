@@ -18,7 +18,7 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Log> Logs { get; set; }
         public DbSet<Message> Messages { get; set; }
 
-        public DbSet<ExpenseEntity> ExpenseEntitys{ get; set; } // DbSet for ExpenseEntity
+        public DbSet<IncomeEntity> ExpenseEntitys{ get; set; } // DbSet for ExpenseEntity
         public DbSet<ServingEntity> Servings { get; set; }
 
 

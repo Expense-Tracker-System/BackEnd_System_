@@ -17,14 +17,14 @@ namespace backend_dotnet7.Core.Services
             _context = context;
         }
 
-        public async Task<ExpenseEntity> AddExpense(ExpenseEntity expense)
+        public async Task<IncomeEntity> AddExpense(IncomeEntity expense)
         {
             _context.ExpenseEntitys.Add(expense);
             await _context.SaveChangesAsync();
             return expense;
         }
 
-        public IEnumerable<ExpenseEntity> GetExpenses()
+        public IEnumerable<IncomeEntity> GetExpenses()
         {
             return _context.ExpenseEntitys.ToList();
         }
@@ -41,7 +41,7 @@ namespace backend_dotnet7.Core.Services
             return false;
         }
 
-        public async Task<ExpenseEntity> GetExpenseById(int id)
+        public async Task<IncomeEntity> GetExpenseById(int id)
         {
             return await _context.ExpenseEntitys.FindAsync(id);
         }
