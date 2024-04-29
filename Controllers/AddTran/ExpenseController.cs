@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using backend_dotnet7.Core.Entities.AddTrEntity;
 using backend_dotnet7.Core.Interfaces;
+using backend_dotnet7.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ExpenseTracker.Controllers
+namespace backend_dotnet7.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ExpenseController : ControllerBase
     {
-        private readonly IExpenseService _expenseService;
+        private readonly IExpenceService _expenseService;
 
-        public ExpenseController(IExpenseService expenseService)
+        public ExpenseController(IExpenceService expenseService)
         {
             _expenseService = expenseService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddExpense([FromBody] IncomeEntity expenseEntity)
+        public async Task<IActionResult> AddExpense([FromBody] ExpenseEntity expense)
         {
             try
             {
@@ -28,7 +29,7 @@ namespace ExpenseTracker.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var result = await _expenseService.AddExpense(expenseEntity);
+                var result = await _expenseService.AddExpense(expense);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -1,6 +1,6 @@
 ﻿namespace backend_dotnet7.Core.Entities.AddTrEntity
 {
-    public class IncomeEntity
+    public class ExpenseEntity
     {
         public int Id { get; set; }
         public double Amount { get; set; }

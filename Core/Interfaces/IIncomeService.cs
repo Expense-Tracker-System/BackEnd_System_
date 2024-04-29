@@ -2,7 +2,7 @@
 
 namespace backend_dotnet7.Core.Interfaces
 {
-    public interface IIncome
+    public interface IIncomeService
     {
 
 

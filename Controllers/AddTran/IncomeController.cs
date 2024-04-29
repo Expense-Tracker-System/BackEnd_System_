@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using backend_dotnet7.Core.Entities.AddTrEntity; // Assuming there's an IncomeEntity class in this namespace
+using backend_dotnet7.Core.Entities.AddTrEntity;
 using backend_dotnet7.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ExpenseTracker.Controllers
+namespace backend_dotnet7.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -19,7 +19,7 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddIncome([FromBody] IncomeEntity incomeEntity)
+        public async Task<IActionResult> AddIncome([FromBody] IncomeEntity income)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace ExpenseTracker.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var result = await _incomeService.AddIncome(incomeEntity);
+                var result = await _incomeService.AddIncome(income);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -39,11 +39,11 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetIncomes()
+        public IActionResult GetIncome()
         {
             try
             {
-                var incomes = _incomeService.GetIncomes();
+                var incomes = _incomeService.GetIncome();
                 return Ok(incomes);
             }
             catch (Exception ex)

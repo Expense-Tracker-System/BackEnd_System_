@@ -8,23 +8,23 @@ using System.Threading.Tasks;
 
 namespace backend_dotnet7.Core.Services
 {
-    public class ExpenseService : IExpenseService
+    public class ExpenceService : IExpenceService
     {
         private readonly ApplicationDbContext _context;
 
-        public ExpenseService(ApplicationDbContext context)
+        public ExpenceService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IncomeEntity> AddExpense(IncomeEntity expense)
+        public async Task<ExpenseEntity> AddExpense(ExpenseEntity expense)
         {
             _context.ExpenseEntitys.Add(expense);
             await _context.SaveChangesAsync();
             return expense;
         }
 
-        public IEnumerable<IncomeEntity> GetExpenses()
+        public IEnumerable<ExpenseEntity> GetExpenses()
         {
             return _context.ExpenseEntitys.ToList();
         }
@@ -41,7 +41,7 @@ namespace backend_dotnet7.Core.Services
             return false;
         }
 
-        public async Task<IncomeEntity> GetExpenseById(int id)
+        public async Task<ExpenseEntity> GetExpenseById(int id)
         {
             return await _context.ExpenseEntitys.FindAsync(id);
         }
