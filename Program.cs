@@ -1,5 +1,4 @@
 using backend_dotnet7.Core.DbContext;
-using backend_dotnet7.Core.Dtos.Helper;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using backend_dotnet7.Core.Services;
@@ -40,8 +39,7 @@ builder.Services.AddScoped<IExpenceService, ExpenceService>();
 builder.Services.AddScoped<IServingService, ServingService>();
 builder.Services.AddScoped< IExpenceService, ExpenceService> ();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
-
-builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSeting"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 //Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()

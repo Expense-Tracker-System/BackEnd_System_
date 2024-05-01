@@ -1,40 +1,57 @@
-﻿using System.Net.Mail;
-using System.Threading.Tasks;
-using backend_dotnet7.Core.Dtos.Helper;
+﻿using backend_dotnet7.Core.Dtos.Email;
 using backend_dotnet7.Core.Interfaces;
-using Microsoft.Extensions.Options;
+using MailKit.Security;
+using MimeKit.Text;
 using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace backend_dotnet7.Core.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly EmailSetting emailSetting;
+        private readonly IConfiguration config;
 
-        public EmailService(IOptions<EmailSetting> emailSetting)
+        public EmailService(IConfiguration config)
         {
-            emailSetting = emailSetting.Value;
+            // Initialize the EmailService with IConfiguration dependency
+            this.config = config;
         }
 
-        public async Task SendEmailAsync(Mailrequest mailrequest)
+        // Method to send an email
+        public string SendEmail(RequestDto request)
         {
+            // Create a new MimeMessage for composing the email
             var email = new MimeMessage();
-            email.Sender = MailboxAddress.Parse(emailSetting.Email);
-            email.To.Add(new MailboxAddress(mailrequest.ToEmail));
-            email.Subject = mailrequest.Subject;
-            var builder =new BodyBuilder();
-            builder.HtmlBody = mailrequest.body;
-            email.Body =builder.ToMessageBody();
 
+            // Set the sender's email address
+            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUserName").Value));
 
+            // Set the recipient's email address
+            email.To.Add(MailboxAddress.Parse(request.To));
+
+            // Set the email subject
+            email.Subject = request.Subject;
+
+            // Set the email body as HTML text
+            email.Body = new TextPart(TextFormat.Html) { Text = request.Message };
+
+            // Create an instance of SmtpClient for sending the email
             using var smtp = new SmtpClient();
-            smtp.Connect(emailSetting, Host, emailSetting.Port);
-            smtp.Authenticate(emailSetting.Email, emailSetting,Password);
-            await smtp.SendAsync(email);
-            smtp.Disconnect(true);
-            throw new NotImplementedException();
 
-       
+            // Connect to the SMTP server with the specified host and port using StartTLS for security
+            smtp.Connect(config.GetSection("EmailHost").Value, 587, SecureSocketOptions.StartTls);
+
+            // Authenticate with the SMTP server using the provided username and password
+            smtp.Authenticate(config.GetSection("EmailUserName").Value, config.GetSection("EmailPassword").Value);
+
+            // Send the composed email
+            smtp.Send(email);
+
+            // Disconnect from the SMTP server after sending the email
+            smtp.Disconnect(true);
+
+            // Return a success message
+            return "Mail Sent";
         }
     }
 }
