@@ -12,7 +12,7 @@ using backend_dotnet7.Core.DbContext;
 namespace backend_dotnet7.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240330193234_init")]
+    [Migration("20240515142537_init")]
     partial class init
     {
         /// <inheritdoc />
