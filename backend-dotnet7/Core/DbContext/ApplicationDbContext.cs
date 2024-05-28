@@ -14,6 +14,9 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Log> Logs { get; set; }
         public DbSet<Message> Messages { get; set; }
 
+        public DbSet<ExpenseEntity> ExpenseEntitys { get; set; } // DbSet for ExpenseEntity
+
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
