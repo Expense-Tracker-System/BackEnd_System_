@@ -102,7 +102,6 @@ namespace backend_dotnet7.Controllers
         // Route -> Get List of all usernames for send message
         [HttpGet]
         [Route("usernames")]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
         public async Task<ActionResult<IEnumerable<string>>> GetUserNamesList()
         {
             var userNames = await _authService.GetUsernameListAsync();
