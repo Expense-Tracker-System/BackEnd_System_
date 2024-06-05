@@ -108,5 +108,18 @@ namespace backend_dotnet7.Controllers
             return Ok(userNames);
         }
 
+        [HttpPut]
+        [Route("updateFirstLatName")]
+        public async Task<ActionResult<LoginServiceResponseDto>> UpdateFirstLastName(UpdateFirstLastNameDto updateFirstLastNameDto)
+        {
+            var updateResult = await _authService.UpdateFirstLastName(updateFirstLastNameDto);
+
+            if(updateResult is null)
+            {
+                return Unauthorized("Your credentials are invalid. Please contact to an Admin");
+            }
+            return Ok(updateResult);
+        }
+
     }
 }
