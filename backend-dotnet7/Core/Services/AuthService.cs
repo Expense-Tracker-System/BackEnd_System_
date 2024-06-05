@@ -215,7 +215,28 @@ namespace backend_dotnet7.Core.Services
             return userNames;
         }
 
-   
+        public async Task<LoginServiceResponseDto?> UpdateFirstLastName(UpdateFirstLastNameDto updateFirstLastNameDto)
+        {
+            var isExistsUser = await _userManager.FindByNameAsync(updateFirstLastNameDto.Username);
+
+            if(isExistsUser is null)
+            {
+                return null;
+            }
+
+            // generate new JWT token...
+            var newToken = await GenerateJWTTokenAsync(isExistsUser);
+            var role = await _userManager.GetRolesAsync(isExistsUser);
+            var userInfo = GenerateUserInfoObject(isExistsUser, role);
+            await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
+
+            return new LoginServiceResponseDto
+            {
+                NewToken = newToken,
+                userInfo = userInfo
+            };
+        }
+
 
 
 
