@@ -121,5 +121,18 @@ namespace backend_dotnet7.Controllers
             return Ok(updateResult);
         }
 
+        [HttpPut]
+        [Route("updateUserName")]
+        public async Task<ActionResult<LoginServiceResponseDto>> UpdateUserName([FromBody] UpdateUserNameDto updateUserNameDto)
+        {
+            var updateResult = await _authService.UpdateUserName(updateUserNameDto);
+
+            if(updateResult is null)
+            {
+                return Unauthorized("Your credentials are invalid. Please contact to an Admin");
+            }
+            return Ok(updateResult);
+        }
+
     }
 }
