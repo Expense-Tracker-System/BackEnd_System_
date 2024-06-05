@@ -224,6 +224,16 @@ namespace backend_dotnet7.Core.Services
                 return null;
             }
 
+            isExistsUser.FirstName = updateFirstLastNameDto.FirstName;
+            isExistsUser.LastName = updateFirstLastNameDto.LastName;
+
+            var updateResult = await _userManager.UpdateAsync(isExistsUser);
+
+            if (!updateResult.Succeeded)
+            {
+                return null;
+            }
+
             // generate new JWT token...
             var newToken = await GenerateJWTTokenAsync(isExistsUser);
             var role = await _userManager.GetRolesAsync(isExistsUser);

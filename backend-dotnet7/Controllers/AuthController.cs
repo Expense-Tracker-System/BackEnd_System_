@@ -110,7 +110,7 @@ namespace backend_dotnet7.Controllers
 
         [HttpPut]
         [Route("updateFirstLatName")]
-        public async Task<ActionResult<LoginServiceResponseDto>> UpdateFirstLastName(UpdateFirstLastNameDto updateFirstLastNameDto)
+        public async Task<ActionResult<LoginServiceResponseDto>> UpdateFirstLastName([FromBody] UpdateFirstLastNameDto updateFirstLastNameDto)
         {
             var updateResult = await _authService.UpdateFirstLastName(updateFirstLastNameDto);
 
