@@ -28,22 +28,43 @@ namespace backend_dotnet7.Core.Services
 
         public async Task<List<Budget>?> DeleteBudget(int id)
         {
-            throw new NotImplementedException();
+            var budget = await dbContext.Budgets.FindAsync(id);
+
+            if (budget is null)
+                return null;
+
+            dbContext.Budgets.Remove(budget);
+            await dbContext.SaveChangesAsync();
+            return await dbContext.Budgets.ToListAsync();
         }
 
         public async Task<List<Budget>> GetAllBudgets()
         {
-            throw new NotImplementedException();
+            var budgets = await dbContext.Budgets.ToListAsync();
+            return budgets;
         }
 
         public async Task<Budget?> GetSingleBudget(int id)
         {
-            throw new NotImplementedException();
+            var budget = await dbContext.Budgets.FindAsync(id);
+
+            if (budget is null) return null;
+
+            return budget;
         }
 
         public async Task<List<Budget>?> UpdateBudget(int id, BudgetDto request)
         {
-            throw new NotImplementedException();
+            var budget = await dbContext.Budgets.FindAsync(id);
+
+            if (budget is null) return null;
+
+            budget.BudgetName = request.BudgetName;
+            budget.BudgetAmount = request.BudgetAmount;
+            budget.BudgetDescription = request.BudgetDescription;
+            await dbContext.SaveChangesAsync();
+
+            return await dbContext.Budgets.ToListAsync();
         }
     }
 }
