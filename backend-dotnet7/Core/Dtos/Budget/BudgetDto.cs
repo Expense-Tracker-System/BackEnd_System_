@@ -1,8 +1,7 @@
-﻿namespace backend_dotnet7.Core.Entities
+﻿namespace backend_dotnet7.Core.Dtos.Budget
 {
-    public class Budget : BaseEntity<long>
+    public class BudgetDto
     {
-        public int BudgetId { get; set; }
         public string BudgetName { get; set; }
         public double BudgetAmount { get; set; }
         public string BudgetDescription { get; set; }

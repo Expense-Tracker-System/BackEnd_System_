@@ -1,8 +1,7 @@
-﻿namespace backend_dotnet7.Core.Entities
+﻿namespace backend_dotnet7.Core.Dtos.Reminder
 {
-    public class Reminder : BaseEntity<long>
+    public class ReminderDto
     {
-        public int ReminderId {  get; set; }
         public string ReminderName { get; set; }
         public double ReminderAmount { get; set; }
         public string ReminderDescription { get; set; }
