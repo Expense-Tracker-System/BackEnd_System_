@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_dotnet7.Core.Entities
 {
@@ -10,6 +9,7 @@ namespace backend_dotnet7.Core.Entities
         public string Address { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string Roles { get; set; }
+        public string? UserImage { get; set; }
 
         //[NotMapped]
         //public IList<string> Roles { get; set; }
