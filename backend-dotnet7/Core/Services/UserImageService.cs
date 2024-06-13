@@ -13,7 +13,20 @@ namespace backend_dotnet7.Core.Services
 
         public void deleteUserImage(string imageNameWithExtension)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(imageNameWithExtension))
+            {
+                throw new ArgumentNullException(nameof(imageNameWithExtension));
+            }
+
+            var contentPath = _environment.ContentRootPath;
+            var path = Path.Combine(contentPath, "Uploads", imageNameWithExtension);
+
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException($"Invalid file {path}");
+            }
+
+            File.Delete(path);
         }
 
         public async Task<string> SaveUserImageAsync(IFormFile imageFile, string[] allowedFileExtensions)
