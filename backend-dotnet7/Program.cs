@@ -36,11 +36,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // .AddSingleton    -> only one Instance for application...
 // .AddScoped       -> Per request -> given new Instance            ->  shared within the same request context
 // .AddTransient    -> when we inject, then newly create Instance   -> not shared across requests
+builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
+builder.Services.AddScoped<IUserImageService, UserImageService>();
 
 //Add Identity
 builder.Services
