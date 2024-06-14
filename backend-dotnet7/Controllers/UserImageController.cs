@@ -71,5 +71,61 @@ namespace backend_dotnet7.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        [HttpPut]
+        [Route("UpdateUserImage")]
+        [Authorize]
+        public async Task<ActionResult<GetImageDto>> UpdateUserImage([FromForm] UpdateUserImageDto updateUserImageDto)
+        {
+            try
+            {
+                var isExistsUser = await _userManager.FindByNameAsync(updateUserImageDto.Username);
+                if(isExistsUser is null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, $"Username: {updateUserImageDto.Username} does not found");
+                }
+
+                var oldUserImage = isExistsUser.UserImage;
+
+                if(oldUserImage is null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, $"Username: {updateUserImageDto.Username} had not UserImage");
+                }
+
+                if (isExistsUser.UserImage != null && updateUserImageDto.ImageFile != null)
+                {
+                    _userImageService.deleteUserImage(oldUserImage);
+                }
+
+                if (updateUserImageDto.ImageFile != null)
+                {
+                    if (updateUserImageDto.ImageFile.Length > 1 * 1024 * 1024)
+                    {
+                        return StatusCode(StatusCodes.Status400BadRequest, "File size should not exceed 1 MB");
+                    }
+
+                    string[] allowedFileExtensions = new string[] { ".jpeg", ".jpg", "png" };
+                    var createdImageName = await _userImageService.SaveUserImageAsync(updateUserImageDto.ImageFile, allowedFileExtensions);
+                    updateUserImageDto.UserImage = createdImageName;
+
+                }
+
+                // -----
+                isExistsUser.UserImage = updateUserImageDto.UserImage;
+
+                return new GetImageDto
+                {
+                    CreatedAt = DateTime.Now,
+                    UserName = updateUserImageDto.Username,
+                    UserImage = updateUserImageDto.UserImage
+                };
+
+            }
+            catch(Exception ex)
+            {
+                _userLogger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }
