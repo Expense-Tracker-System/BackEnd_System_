@@ -40,7 +40,7 @@ namespace backend_dotnet7.Controllers
                 }
 
                 string[] allowedFileExtensions = new string[] { ".jpeg", ".jpg", "png" };
-                var createdImageName = await _userImageService.SaveUserImageAsync(addUserImageDto.ImageFile, allowedFileExtensions);
+                var createdImageName = await _userImageService.SaveUserImageAsync(addUserImageDto.Username, addUserImageDto.ImageFile, allowedFileExtensions);
 
                 var isExistsUser = await _userManager.FindByNameAsync(addUserImageDto.Username);
 
@@ -94,7 +94,7 @@ namespace backend_dotnet7.Controllers
 
                 if (isExistsUser.UserImage != null && updateUserImageDto.ImageFile != null)
                 {
-                    _userImageService.deleteUserImage(oldUserImage);
+                    _userImageService.deleteUserImage(updateUserImageDto.Username, oldUserImage);
                 }
 
                 if (updateUserImageDto.ImageFile != null)
@@ -105,13 +105,20 @@ namespace backend_dotnet7.Controllers
                     }
 
                     string[] allowedFileExtensions = new string[] { ".jpeg", ".jpg", "png" };
-                    var createdImageName = await _userImageService.SaveUserImageAsync(updateUserImageDto.ImageFile, allowedFileExtensions);
+                    var createdImageName = await _userImageService.SaveUserImageAsync(updateUserImageDto.Username, updateUserImageDto.ImageFile, allowedFileExtensions);
                     updateUserImageDto.UserImage = createdImageName;
 
                 }
 
                 // -----
                 isExistsUser.UserImage = updateUserImageDto.UserImage;
+
+                var updateResult = await _userManager.UpdateAsync(isExistsUser);
+
+                if (!updateResult.Succeeded)
+                {
+                    return null;
+                }
 
                 return new GetImageDto
                 {
@@ -122,6 +129,42 @@ namespace backend_dotnet7.Controllers
 
             }
             catch(Exception ex)
+            {
+                _userLogger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteUserImage")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUserImage(string userName)
+        {
+            try
+            {
+                var isExistsUser = await _userManager.FindByNameAsync(userName);
+                if(isExistsUser is null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, $"Username: {userName} does not found");
+                }
+
+                if(isExistsUser.UserImage is not null)
+                {
+                    _userImageService.deleteUserImage(userName, isExistsUser.UserImage);
+                }
+
+                isExistsUser.UserImage = null;
+
+                var updateResult = await _userManager.UpdateAsync(isExistsUser);
+
+                if(!updateResult.Succeeded)
+                {
+                    return null;
+                }
+
+                return NoContent();
+
+            }catch(Exception ex)
             {
                 _userLogger.LogError(ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);

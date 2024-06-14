@@ -11,7 +11,7 @@ namespace backend_dotnet7.Core.Services
             _environment = environment;
         }
 
-        public void deleteUserImage(string imageNameWithExtension)
+        public void deleteUserImage(string userName, string imageNameWithExtension)
         {
             if (string.IsNullOrEmpty(imageNameWithExtension))
             {
@@ -19,7 +19,7 @@ namespace backend_dotnet7.Core.Services
             }
 
             var contentPath = _environment.ContentRootPath;
-            var path = Path.Combine(contentPath, "Uploads", imageNameWithExtension);
+            var path = Path.Combine(contentPath, "Uploads",userName, imageNameWithExtension);
 
             if (!File.Exists(path))
             {
@@ -29,7 +29,7 @@ namespace backend_dotnet7.Core.Services
             File.Delete(path);
         }
 
-        public async Task<string> SaveUserImageAsync(IFormFile imageFile, string[] allowedFileExtensions)
+        public async Task<string> SaveUserImageAsync(string userName, IFormFile imageFile, string[] allowedFileExtensions)
         {
             // ----
             if(imageFile == null)
@@ -39,7 +39,7 @@ namespace backend_dotnet7.Core.Services
 
             // -----
             var contentPath = _environment.ContentRootPath;
-            var path = Path.Combine(contentPath, "Uploads");
+            var path = Path.Combine(contentPath, "Uploads", userName);
             // ------
 
             // ------
