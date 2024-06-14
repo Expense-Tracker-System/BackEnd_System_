@@ -1,6 +1,6 @@
 ﻿namespace backend_dotnet7.Core.Entities
 {
-    public class Reminder : BaseEntity<long>
+    public class Reminder 
     {
         public int ReminderId {  get; set; }
         public string ReminderName { get; set; }
