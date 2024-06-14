@@ -49,6 +49,17 @@ namespace backend_dotnet7.Core.Services
             }
 
             // -----
+            var filesInDirectory = Directory.GetFiles(path);
+            foreach ( var file in filesInDirectory)
+            {
+                var fileExtension = Path.GetExtension(file).ToLowerInvariant();
+                if (allowedFileExtensions.Contains(fileExtension))
+                {
+                    throw new ArgumentException("already have");
+                }
+            }
+
+            // -----
             var ext = Path.GetExtension(imageFile.FileName);
 
             // -----
