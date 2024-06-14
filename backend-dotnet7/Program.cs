@@ -165,6 +165,9 @@ app.UseCors(options =>
 
 app.UseHttpsRedirection();
 
+// Everything
+app.UseCors();
+
 //************************
 app.UseAuthentication();
 app.UseAuthorization();
