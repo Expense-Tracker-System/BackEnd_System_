@@ -1,6 +1,6 @@
 ﻿namespace backend_dotnet7.Core.Entities
 {
-    public class Budget : BaseEntity<long>
+    public class Budget 
     {
         public int BudgetId { get; set; }
         public string BudgetName { get; set; }
