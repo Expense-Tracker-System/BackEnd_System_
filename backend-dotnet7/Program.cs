@@ -44,6 +44,17 @@ builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<IUserImageService, UserImageService>();
 
+// registers CORS services during service configuration
+//  global CORS settings
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader(); ;
+        });
+});
+
 //Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
@@ -138,6 +149,8 @@ if (app.Environment.IsDevelopment())
 
 
 // Avoid the cores policy
+// configures CORS middleware using in the request pipeline.
+// per-endpoint customization
 app.UseCors(options =>
 {
     options
