@@ -11,10 +11,9 @@ namespace backend_dotnet7.Controllers
 {
     [Route("api/UserImage")]
     [ApiController]
-    public class UserImageController : Controller
+    public class UserImageController : ControllerBase
     {
         private readonly IUserImageService _userImageService;
-        private readonly ApplicationDbContext _applicationDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<UserImageController> _userLogger;
 
@@ -22,7 +21,6 @@ namespace backend_dotnet7.Controllers
         public UserImageController(IUserImageService userImageService, ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, ILogger<UserImageController> userLogger)
         {
             _userImageService = userImageService;
-            _applicationDbContext = applicationDbContext;
             _userManager = userManager;
             _userLogger = userLogger;
         }
@@ -34,7 +32,7 @@ namespace backend_dotnet7.Controllers
         {
             try
             {
-                if(addUserImageDto.ImageFile.Length > 1 * 1024 * 1024)
+                if (addUserImageDto.ImageFile.Length > 1 * 1024 * 1024)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, "File size should not exceed 1 MB");
                 }
@@ -44,7 +42,7 @@ namespace backend_dotnet7.Controllers
 
                 var isExistsUser = await _userManager.FindByNameAsync(addUserImageDto.Username);
 
-                if(isExistsUser is null)
+                if (isExistsUser is null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, $"Username: {addUserImageDto.Username} does not found");
                 }
@@ -65,7 +63,7 @@ namespace backend_dotnet7.Controllers
                     UserImage = createdImageName
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _userLogger.LogError(ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -80,14 +78,14 @@ namespace backend_dotnet7.Controllers
             try
             {
                 var isExistsUser = await _userManager.FindByNameAsync(updateUserImageDto.Username);
-                if(isExistsUser is null)
+                if (isExistsUser is null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, $"Username: {updateUserImageDto.Username} does not found");
                 }
 
                 var oldUserImage = isExistsUser.UserImage;
 
-                if(oldUserImage is null)
+                if (oldUserImage is null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, $"Username: {updateUserImageDto.Username} had not UserImage");
                 }
@@ -128,7 +126,7 @@ namespace backend_dotnet7.Controllers
                 };
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _userLogger.LogError(ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -143,12 +141,12 @@ namespace backend_dotnet7.Controllers
             try
             {
                 var isExistsUser = await _userManager.FindByNameAsync(userName);
-                if(isExistsUser is null)
+                if (isExistsUser is null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, $"Username: {userName} does not found");
                 }
 
-                if(isExistsUser.UserImage is not null)
+                if (isExistsUser.UserImage is not null)
                 {
                     _userImageService.deleteUserImage(userName, isExistsUser.UserImage);
                 }
@@ -157,18 +155,49 @@ namespace backend_dotnet7.Controllers
 
                 var updateResult = await _userManager.UpdateAsync(isExistsUser);
 
-                if(!updateResult.Succeeded)
+                if (!updateResult.Succeeded)
                 {
                     return null;
                 }
 
                 return NoContent();
 
-            }catch(Exception ex)
+            } catch (Exception ex)
             {
                 _userLogger.LogError(ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("GetUserImage")]
+        [Authorize]
+        public async Task<ActionResult<GetImageDto?>> GetUserImageByUserName()
+        {
+            if (User?.Identity?.Name == null)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, "User is not authenticated.");
+            }
+
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            if(user is null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, $"userName : {User.Identity.Name} Not founded");
+            }
+
+            if(user.UserImage is null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, $"userName : {user.UserName} with userImage Not founded");
+            }
+
+            return new GetImageDto
+            {
+                CreatedAt = DateTime.Now,
+                UserName = user.UserName,
+                UserImage = user.UserImage
+            };
+        
         }
     }
 }
