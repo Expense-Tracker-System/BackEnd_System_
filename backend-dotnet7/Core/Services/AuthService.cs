@@ -256,6 +256,13 @@ namespace backend_dotnet7.Core.Services
                 return null;
             }
 
+            // userName is unique...
+            var userNameList = await GetUsernameListAsync();
+            if (userNameList.Contains(updateUserNameDto.NewUserName))
+            {
+                return null;
+            }
+
             isExistsUser.UserName = updateUserNameDto.NewUserName;
 
             var updateResult = await _userManager.UpdateAsync(isExistsUser);
