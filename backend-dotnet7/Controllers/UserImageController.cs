@@ -6,6 +6,7 @@ using backend_dotnet7.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace backend_dotnet7.Controllers
 {
@@ -28,40 +29,41 @@ namespace backend_dotnet7.Controllers
         [HttpPost]
         [Route("AddUserImage")]
         [Authorize]
-        public async Task<ActionResult<GetImageDto>> AddUserImage([FromForm] AddUserImageDto addUserImageDto)
+        public async Task<IActionResult> AddUserImage([FromForm] AddUserImageDto addUserImageDto)
         {
             try
             {
+                if (addUserImageDto.ImageFile is null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, "File is empty");
+                }
+
                 if (addUserImageDto.ImageFile.Length > 1 * 1024 * 1024)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, "File size should not exceed 1 MB");
                 }
 
                 string[] allowedFileExtensions = new string[] { ".jpeg", ".jpg", "png" };
-                var createdImageName = await _userImageService.SaveUserImageAsync(addUserImageDto.Username, addUserImageDto.ImageFile, allowedFileExtensions);
 
-                var isExistsUser = await _userManager.FindByNameAsync(addUserImageDto.Username);
-
-                if (isExistsUser is null)
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId is null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, $"Username: {addUserImageDto.Username} does not found");
+                    return NotFound("User does not exist.");
                 }
+                var userExists = await _userManager.FindByIdAsync(userId);
 
-                isExistsUser.UserImage = createdImageName;
+                var createdImageName = await _userImageService.SaveUserImageAsync(userExists.UserName, addUserImageDto.ImageFile, allowedFileExtensions);
 
-                var updateResult = await _userManager.UpdateAsync(isExistsUser);
+                userExists.UserImage = createdImageName;
+
+                var updateResult = await _userManager.UpdateAsync(userExists);
 
                 if (!updateResult.Succeeded)
                 {
                     return null;
                 }
 
-                return new GetImageDto
-                {
-                    CreatedAt = DateTime.Now,
-                    UserName = addUserImageDto.Username,
-                    UserImage = createdImageName
-                };
+                return Ok(updateResult);
             }
             catch (Exception ex)
             {
