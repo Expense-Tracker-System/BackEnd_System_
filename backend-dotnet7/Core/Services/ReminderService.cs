@@ -20,7 +20,8 @@ namespace backend_dotnet7.Core.Services
                 ReminderName = reminder.ReminderName,
                 ReminderAmount = reminder.ReminderAmount,
                 ReminderDescription = reminder.ReminderDescription,
-                ReminderDate = reminder.ReminderDate
+                ReminderstartDate = reminder.ReminderstartDate,
+                ReminderendDate = reminder.ReminderendDate
             };
             dbContext.Reminders.Add(newrem);
             await dbContext.SaveChangesAsync();
