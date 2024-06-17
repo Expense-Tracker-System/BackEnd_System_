@@ -35,7 +35,7 @@ namespace backend_dotnet7.Controllers
             {
                 if (addUserImageDto.ImageFile is null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, "File is empty");
+                    return StatusCode(StatusCodes.Status400BadRequest, "File is empty");
                 }
 
                 if (addUserImageDto.ImageFile.Length > 1 * 1024 * 1024)
