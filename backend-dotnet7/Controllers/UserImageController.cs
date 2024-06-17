@@ -48,9 +48,19 @@ namespace backend_dotnet7.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId is null)
                 {
-                    return NotFound("User does not exist.");
+                    return StatusCode(StatusCodes.Status404NotFound, "User does not exist.");
                 }
                 var userExists = await _userManager.FindByIdAsync(userId);
+                if (userExists is null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, "User does not exist.");
+                }
+                
+
+                if(userExists.UserName is null)
+                {
+                    throw new ArgumentNullException("Can't create path, because userName is null");
+                }
 
                 var createdImageName = await _userImageService.SaveUserImageAsync(userExists.UserName, addUserImageDto.ImageFile, allowedFileExtensions);
 

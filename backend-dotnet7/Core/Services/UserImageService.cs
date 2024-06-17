@@ -31,12 +31,6 @@ namespace backend_dotnet7.Core.Services
 
         public async Task<string> SaveUserImageAsync(string userName, IFormFile imageFile, string[] allowedFileExtensions)
         {
-            // ----
-            if(imageFile == null)
-            {
-                throw new ArgumentNullException(nameof(imageFile));
-            }
-
             // -----
             var contentPath = _environment.ContentRootPath;
             var path = Path.Combine(contentPath, "Uploads", userName);
