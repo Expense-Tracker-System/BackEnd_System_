@@ -102,11 +102,36 @@ namespace backend_dotnet7.Controllers
         // Route -> Get List of all usernames for send message
         [HttpGet]
         [Route("usernames")]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
         public async Task<ActionResult<IEnumerable<string>>> GetUserNamesList()
         {
             var userNames = await _authService.GetUsernameListAsync();
             return Ok(userNames);
+        }
+
+        [HttpPut]
+        [Route("updateFirstLatName")]
+        public async Task<ActionResult<LoginServiceResponseDto>> UpdateFirstLastName([FromBody] UpdateFirstLastNameDto updateFirstLastNameDto)
+        {
+            var updateResult = await _authService.UpdateFirstLastName(updateFirstLastNameDto);
+
+            if(updateResult is null)
+            {
+                return Unauthorized("Your credentials are invalid. Please contact to an Admin");
+            }
+            return Ok(updateResult);
+        }
+
+        [HttpPut]
+        [Route("updateUserName")]
+        public async Task<ActionResult<LoginServiceResponseDto>> UpdateUserName([FromBody] UpdateUserNameDto updateUserNameDto)
+        {
+            var updateResult = await _authService.UpdateUserName(updateUserNameDto);
+
+            if(updateResult is null)
+            {
+                return Unauthorized("Your credentials are invalid. Please contact to an Admin");
+            }
+            return Ok(updateResult);
         }
 
     }
