@@ -215,76 +215,7 @@ namespace backend_dotnet7.Core.Services
             return userNames;
         }
 
-        public async Task<LoginServiceResponseDto?> UpdateFirstLastName(UpdateFirstLastNameDto updateFirstLastNameDto)
-        {
-            var isExistsUser = await _userManager.FindByNameAsync(updateFirstLastNameDto.Username);
-
-            if(isExistsUser is null)
-            {
-                return null;
-            }
-
-            isExistsUser.FirstName = updateFirstLastNameDto.FirstName;
-            isExistsUser.LastName = updateFirstLastNameDto.LastName;
-
-            var updateResult = await _userManager.UpdateAsync(isExistsUser);
-
-            if (!updateResult.Succeeded)
-            {
-                return null;
-            }
-
-            // generate new JWT token...
-            var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var role = await _userManager.GetRolesAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser, role);
-            await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
-
-            return new LoginServiceResponseDto
-            {
-                NewToken = newToken,
-                userInfo = userInfo
-            };
-        }
-
-        public async Task<LoginServiceResponseDto?> UpdateUserName(UpdateUserNameDto updateUserNameDto)
-        {
-            var isExistsUser = await _userManager.FindByNameAsync(updateUserNameDto.UserName);
-
-            if (isExistsUser is null)
-            {
-                return null;
-            }
-
-            // userName is unique...
-            var userNameList = await GetUsernameListAsync();
-            if (userNameList.Contains(updateUserNameDto.NewUserName))
-            {
-                return null;
-            }
-
-            isExistsUser.UserName = updateUserNameDto.NewUserName;
-
-            var updateResult = await _userManager.UpdateAsync(isExistsUser);
-
-            if (!updateResult.Succeeded)
-            {
-                return null;
-            }
-
-            // generate new JWT token...
-            var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var role = await _userManager.GetRolesAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser, role);
-            await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
-
-            return new LoginServiceResponseDto
-            {
-                NewToken = newToken,
-                userInfo = userInfo
-            };
-        }
-
+   
 
 
 
