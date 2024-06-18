@@ -166,12 +166,14 @@ app.UseCors(options =>
 
 app.UseHttpsRedirection();
 
+/*
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
            Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
     RequestPath = "/Resources"
 });
+*/
 
 // Everything
 app.UseCors();
