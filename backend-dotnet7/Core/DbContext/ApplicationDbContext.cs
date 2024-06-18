@@ -13,8 +13,6 @@ namespace backend_dotnet7.Core.DbContext
 
         public DbSet<Log> Logs { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<Reminder> Reminders { get; set; }
-        public DbSet<Budget> Budgets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
