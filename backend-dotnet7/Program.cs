@@ -5,6 +5,8 @@ using backend_dotnet7.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -32,10 +34,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 //Dependency Injection
+// .AddSingleton    -> only one Instance for application...
+// .AddScoped       -> Per request -> given new Instance            ->  shared within the same request context
+// .AddTransient    -> when we inject, then newly create Instance   -> not shared across requests
+builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IReminderService, ReminderService>();
+builder.Services.AddScoped<IUserImageService, UserImageService>();
 
+// registers CORS services during service configuration
+//  global CORS settings
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader(); ;
+        });
+});
 
 //Add Identity
 builder.Services
@@ -131,6 +150,8 @@ if (app.Environment.IsDevelopment())
 
 
 // Avoid the cores policy
+// configures CORS middleware using in the request pipeline.
+// per-endpoint customization
 app.UseCors(options =>
 {
     options
@@ -144,6 +165,16 @@ app.UseCors(options =>
 
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
+    RequestPath = "/Resources"
+});
+
+// Everything
+app.UseCors();
 
 //************************
 app.UseAuthentication();

@@ -75,6 +75,7 @@ namespace backend_dotnet7.Controllers
         // Route -> List of all Users with details
         [HttpGet]
         [Route("users")]
+        [Authorize(Roles = StaticUserRoles.ADMIN)]
         public async Task<ActionResult<IEnumerable<UserInfoResult>>> GetUsersList()
         {
             var usersList = await _authService.GetUsersListAsync();
@@ -84,6 +85,7 @@ namespace backend_dotnet7.Controllers
         // Route -> Get a User by UserName
         [HttpGet]
         [Route("users/{userName}")] //[Route("users/{parameter}")]
+        [Authorize(Roles = StaticUserRoles.ADMIN)]
         public async Task<ActionResult<UserInfoResult>> GetUserDetailsByUserName([FromRoute] string userName)
         {
             var user = await _authService.GetUserDetailsByUserNameAsync(userName);
@@ -104,6 +106,32 @@ namespace backend_dotnet7.Controllers
         {
             var userNames = await _authService.GetUsernameListAsync();
             return Ok(userNames);
+        }
+
+        [HttpPut]
+        [Route("updateFirstLatName")]
+        public async Task<ActionResult<LoginServiceResponseDto>> UpdateFirstLastName([FromBody] UpdateFirstLastNameDto updateFirstLastNameDto)
+        {
+            var updateResult = await _authService.UpdateFirstLastName(updateFirstLastNameDto);
+
+            if(updateResult is null)
+            {
+                return Unauthorized("Your credentials are invalid. Please contact to an Admin");
+            }
+            return Ok(updateResult);
+        }
+
+        [HttpPut]
+        [Route("updateUserName")]
+        public async Task<ActionResult<LoginServiceResponseDto>> UpdateUserName([FromBody] UpdateUserNameDto updateUserNameDto)
+        {
+            var updateResult = await _authService.UpdateUserName(updateUserNameDto);
+
+            if(updateResult is null)
+            {
+                return Unauthorized("Your credentials are invalid. Please contact to an Admin");
+            }
+            return Ok(updateResult);
         }
 
     }
