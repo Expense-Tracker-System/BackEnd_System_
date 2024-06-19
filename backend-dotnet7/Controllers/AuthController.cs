@@ -52,7 +52,6 @@ namespace backend_dotnet7.Controllers
         // Route -> getting data of a user from it's JWT
         [HttpPost]
         [Route("me")]
-        [Authorize]
         public async Task<ActionResult<LoginServiceResponseDto>> Me([FromBody] MeDto token)
         {
             try
