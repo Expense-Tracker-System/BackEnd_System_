@@ -23,7 +23,7 @@ namespace backend_dotnet7.Controllers
         [HttpPut]
         [Route("updateUserEmail")]
         [Authorize]
-        public async Task<ActionResult<UpdateEmailResponseDto>> updateUserEmail(UpdateUserEmailDto updateUserEmailDto)
+        public async Task<IActionResult> updateUserEmail(UpdateUserEmailDto updateUserEmailDto)
         {
             try
             {
@@ -56,21 +56,7 @@ namespace backend_dotnet7.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest, errors);
                 }
 
-                var userInfoObject = new UserInfoResult
-                {
-                    Id = isExists.Id,
-                    FirstName = isExists.FirstName,
-                    LastName = isExists.LastName,
-                    Email = isExists.Email,
-                    UserName = isExists.UserName,
-                    CreatedAt = isExists.CreatedAt,
-                    Roles = isExists.Roles
-                };
-
-                return new UpdateEmailResponseDto
-                {
-                    userInfo = userInfoObject
-                };
+                return Ok(isValid);
 
             }
             catch (Exception ex)

@@ -17,10 +17,10 @@ namespace backend_dotnet7.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BudgetName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BudgetId = table.Column<int>(type: "int", nullable: false),
+                    BudgetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BudgetAmount = table.Column<double>(type: "float", nullable: false),
-                    BudgetDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BudgetDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -74,12 +74,11 @@ namespace backend_dotnet7.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ReminderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReminderId = table.Column<int>(type: "int", nullable: false),
+                    ReminderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReminderAmount = table.Column<double>(type: "float", nullable: false),
-                    ReminderDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReminderstartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReminderendDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReminderDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReminderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
