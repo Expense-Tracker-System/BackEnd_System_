@@ -52,6 +52,7 @@ namespace backend_dotnet7.Controllers
         // Route -> getting data of a user from it's JWT
         [HttpPost]
         [Route("me")]
+        [Authorize]
         public async Task<ActionResult<LoginServiceResponseDto>> Me([FromBody] MeDto token)
         {
             try
@@ -102,6 +103,7 @@ namespace backend_dotnet7.Controllers
         // Route -> Get List of all usernames for send message
         [HttpGet]
         [Route("usernames")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<string>>> GetUserNamesList()
         {
             var userNames = await _authService.GetUsernameListAsync();
@@ -110,6 +112,7 @@ namespace backend_dotnet7.Controllers
 
         [HttpPut]
         [Route("updateFirstLatName")]
+        [Authorize]
         public async Task<ActionResult<LoginServiceResponseDto>> UpdateFirstLastName([FromBody] UpdateFirstLastNameDto updateFirstLastNameDto)
         {
             var updateResult = await _authService.UpdateFirstLastName(updateFirstLastNameDto);
@@ -123,6 +126,7 @@ namespace backend_dotnet7.Controllers
 
         [HttpPut]
         [Route("updateUserName")]
+        [Authorize]
         public async Task<ActionResult<LoginServiceResponseDto>> UpdateUserName([FromBody] UpdateUserNameDto updateUserNameDto)
         {
             var updateResult = await _authService.UpdateUserName(updateUserNameDto);
