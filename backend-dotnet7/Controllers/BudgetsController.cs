@@ -17,9 +17,9 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Budget>>> GetAllBudgets()
+        public async Task<ActionResult<List<getbudgetDto>>> GetAllBudgets(string username)
         {
-            var result = await _budgetService.GetAllBudgets();
+            var result = await _budgetService.GetAllBudgets(username);
 
             return Ok(result);
         }

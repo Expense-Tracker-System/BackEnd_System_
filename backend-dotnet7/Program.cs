@@ -44,6 +44,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<IUserImageService, UserImageService>();
+builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 
 // registers CORS services during service configuration
 //  global CORS settings
@@ -166,12 +167,14 @@ app.UseCors(options =>
 
 app.UseHttpsRedirection();
 
+/*
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
            Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
     RequestPath = "/Resources"
 });
+*/
 
 // Everything
 app.UseCors();

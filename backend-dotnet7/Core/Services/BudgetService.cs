@@ -1,4 +1,5 @@
 ﻿using backend_dotnet7.Core.DbContext;
+using backend_dotnet7.Core.Dtos.BExpense;
 using backend_dotnet7.Core.Dtos.Budget;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
@@ -8,18 +9,19 @@ namespace backend_dotnet7.Core.Services
 {
     public class BudgetService : IBudgetService
     {
-        protected readonly ApplicationDbContext dbContext;
-        public BudgetService(ApplicationDbContext context)
-        {
-            dbContext = context;
-        }
+            protected readonly ApplicationDbContext dbContext;
+            public BudgetService(ApplicationDbContext context)
+            {
+                dbContext = context;
+            }
         public async Task<List<Budget>> AddBudget(BudgetDto budget)
         {
             var newbudget = new Budget
                 {
                 BudgetName = budget.BudgetName,
                 BudgetAmount = budget.BudgetAmount,
-                BudgetDescription = budget.BudgetDescription
+                BudgetDescription = budget.BudgetDescription,
+                UserName = budget.UserName,
                 };
             dbContext.Budgets.Add(newbudget);
             await dbContext.SaveChangesAsync();
@@ -38,10 +40,43 @@ namespace backend_dotnet7.Core.Services
             return await dbContext.Budgets.ToListAsync();
         }
 
-        public async Task<List<Budget>> GetAllBudgets()
+        public async Task<List<getbudgetDto>> GetAllBudgets(string username)
         {
-            var budgets = await dbContext.Budgets.ToListAsync();
-            return budgets;
+            var budgets = await dbContext.Budgets.Where(e=>e.UserName==username).ToListAsync();
+            var getbudget = new List<getbudgetDto>();
+            foreach (var budget in budgets)
+            {
+                var expenses=await dbContext.BExpenses.Where(e=>e.BudgetId==budget.BudgetId).ToListAsync();
+                var expensesdto=new List<BExpenseDto>();
+                foreach(var expense in expenses)
+                {
+                    var b = new BExpenseDto
+                    {
+                        BudgetId = expense.BudgetId,
+                        BExpenseAmount = expense.BExpenseAmount,
+                        BExpenseName = expense.BExpenseName
+
+                    };
+                    expensesdto.Add(b);
+                }
+                var totalExpense = await dbContext.BExpenses
+                                    .Where(e => e.BudgetId == budget.BudgetId)
+                                    .SumAsync(e => e.BExpenseAmount);
+
+                var a = new getbudgetDto
+                {
+                    Id = budget.BudgetId,
+                    budgetName = budget.BudgetName,
+                    budgetAmount = budget.BudgetAmount,
+                    budgetDescription = budget.BudgetDescription,
+                    remain = budget.BudgetAmount -totalExpense,
+                    spent = totalExpense,
+                    expenses = expensesdto,
+
+                };
+                getbudget.Add(a);
+            }
+            return getbudget;
         }
 
         public async Task<Budget?> GetSingleBudget(int id)
