@@ -132,8 +132,7 @@ namespace backend_dotnet7.Core.Services
 
             //Return Token and userInfo to front-end
             var NewToken = await GenerateJWTTokenAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, roles);
+            var userInfo = GenerateUserInfoObject(user);
             await _logService.SaveNewLog(user.UserName, "New Login");
 
             return new LoginServiceResponseDto()
@@ -165,8 +164,7 @@ namespace backend_dotnet7.Core.Services
                 return null;
 
             var NewToken = await GenerateJWTTokenAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, roles);
+            var userInfo = GenerateUserInfoObject(user);
             await _logService.SaveNewLog(user.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto()
@@ -186,8 +184,7 @@ namespace backend_dotnet7.Core.Services
 
             foreach(var user in users)
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                var userInfo = GenerateUserInfoObject(user, roles);
+                var userInfo = GenerateUserInfoObject(user);
                 userInfoResults.Add(userInfo);
             }
 
@@ -200,8 +197,7 @@ namespace backend_dotnet7.Core.Services
             if (user is null)
                 return null;
 
-            var role = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, role);
+            var userInfo = GenerateUserInfoObject(user);
 
             return userInfo;
         }
@@ -236,8 +232,7 @@ namespace backend_dotnet7.Core.Services
 
             // generate new JWT token...
             var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var role = await _userManager.GetRolesAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser, role);
+            var userInfo = GenerateUserInfoObject(isExistsUser);
             await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto
@@ -274,8 +269,7 @@ namespace backend_dotnet7.Core.Services
 
             // generate new JWT token...
             var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var role = await _userManager.GetRolesAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser, role);
+            var userInfo = GenerateUserInfoObject(isExistsUser);
             await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto
@@ -332,7 +326,7 @@ namespace backend_dotnet7.Core.Services
 
 
         //GenerateUserInfoObject
-        private UserInfoResult GenerateUserInfoObject(ApplicationUser user, IEnumerable<string> Roles)
+        private UserInfoResult GenerateUserInfoObject(ApplicationUser user)
         {
             return new UserInfoResult()
             {
