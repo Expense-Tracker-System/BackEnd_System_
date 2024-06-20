@@ -18,13 +18,15 @@ namespace backend_dotnet7.Core.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogService _logService;
         private readonly IConfiguration _configuration;
+        private readonly IUserPasswordConfirmService _userPasswordConfirmService;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,ILogService logService, IConfiguration configuration)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,ILogService logService, IConfiguration configuration, IUserPasswordConfirmService userPasswordConfirmService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _logService = logService;
             _configuration = configuration;
+            _userPasswordConfirmService = userPasswordConfirmService;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -61,6 +63,22 @@ namespace backend_dotnet7.Core.Services
                     IsSucceed = false,
                     StatusCode = 409,
                     Message = "UserName Alredy Exists"
+                };
+
+            var confirmPasswordDto = new ConfirmPasswordDto
+            {
+                password = registerDto.Password,
+                confirmPassword = registerDto.ConfirmPassword
+            };
+
+            var result = await _userPasswordConfirmService.userPasswordConfirm(confirmPasswordDto);
+
+            if (result is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Password Confirmation is Failed"
                 };
 
             ApplicationUser newUser = new ApplicationUser()
