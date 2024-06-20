@@ -104,7 +104,7 @@ namespace backend_dotnet7.Core.Services
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 UserName = registerDto.Username,
-                Address = registerDto.Address,
+                PhoneNumber = registerDto.PhoneNumber,
                 Roles = "User",
                 SecurityStamp = Guid.NewGuid().ToString()
             };
