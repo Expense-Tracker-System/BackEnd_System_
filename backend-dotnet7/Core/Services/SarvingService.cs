@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_dotnet7.Core.Services
 {
-    public class SarvingService : IServingService
+    public class SarvingService : ISavingService
 
     {
 
@@ -14,7 +14,7 @@ namespace backend_dotnet7.Core.Services
 
         public SarvingService(ApplicationDbContext context)
         {
-            _context=context;
+            _context = context;
         }
         public async Task<SavingViewEntities> GetSarvingData(SavingViewEntities model)
         {

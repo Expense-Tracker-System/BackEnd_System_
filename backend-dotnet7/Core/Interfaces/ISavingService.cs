@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend_dotnet7.Core.Interfaces
 {
-    public interface IServingService
+    public interface ISavingService
     {
         Task<SavingViewEntities> GetSarvingData(SavingViewEntities model);
     }

@@ -37,7 +37,7 @@ builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<IServingService,ServingService>();
+builder.Services.AddScoped<ISavingService,SarvingService>();
 
 
 

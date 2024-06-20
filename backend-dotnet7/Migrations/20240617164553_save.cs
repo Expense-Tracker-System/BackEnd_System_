@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend_dotnet7.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class save : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,6 +60,35 @@ namespace backend_dotnet7.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SavingViewEntitiess",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Year = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Month = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SavingViewEntitiess", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransactionEntities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Amount = table.Column<double>(type: "float", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionEntities", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -249,6 +278,12 @@ namespace backend_dotnet7.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "SavingViewEntitiess");
+
+            migrationBuilder.DropTable(
+                name: "TransactionEntities");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");

@@ -116,10 +116,10 @@ namespace backend_dotnet7.Core.Services
             }
 
             //Find Correct Mode
-            if(!String.Equals(loginDto.Mode, user.Roles, StringComparison.OrdinalIgnoreCase))
-{
-                return null;
-            }
+//            if(!String.Equals(loginDto.Mode, user.Roles, StringComparison.OrdinalIgnoreCase))
+//{
+//                return null;
+//            }
 
 
             //Check password of user

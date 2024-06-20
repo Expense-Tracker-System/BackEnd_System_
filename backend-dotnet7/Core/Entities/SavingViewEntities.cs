@@ -2,7 +2,7 @@
 {
     public class SavingViewEntities
     {
-        public int BankID { get; set; }
+        public int Id { get; set; }
         public string Year { get; set; }
         public string Month { get; set; }
     }

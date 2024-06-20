@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using backend_dotnet7.Core.Entities;
+using backend_dotnet7.Core.Dtos;
 using backend_dotnet7.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend_dotnet7.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Ensure endpoint requires authentication
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
@@ -18,7 +20,7 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTransaction([FromBody] TransactionEntities transaction)
+        public async Task<IActionResult> AddTransaction([FromBody] TransactionDto transaction)
         {
             try
             {
@@ -27,7 +29,10 @@ namespace backend_dotnet7.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var result = await _transactionService.AddTransaction(transaction);
+                var userName = User.Identity.Name;
+                //transaction.getLogDto.UserName = userName;
+
+                var result = await _transactionService.AddTransaction(transaction, userName);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -42,7 +47,8 @@ namespace backend_dotnet7.Controllers
         {
             try
             {
-                var transactions = _transactionService.GetTransactions();
+                var userName = User.Identity.Name;
+                var transactions = _transactionService.GetTransactions(userName);
                 return Ok(transactions);
             }
             catch (Exception ex)
@@ -57,7 +63,8 @@ namespace backend_dotnet7.Controllers
         {
             try
             {
-                var deleted = await _transactionService.DeleteTransaction(id);
+                var userName = User.Identity.Name;
+                var deleted = await _transactionService.DeleteTransaction(id, userName);
                 if (!deleted)
                 {
                     return NotFound();
@@ -73,7 +80,7 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTransaction(int id, [FromBody] TransactionEntities transaction)
+        public async Task<IActionResult> UpdateTransaction(int id, [FromBody] TransactionDto transaction)
         {
             try
             {
@@ -82,7 +89,10 @@ namespace backend_dotnet7.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var updatedTransaction = await _transactionService.UpdateTransaction(id, transaction);
+                var userName = User.Identity.Name;
+                transaction.getLogDto.UserName = userName;
+
+                var updatedTransaction = await _transactionService.UpdateTransaction(id, transaction, userName);
                 if (updatedTransaction == null)
                 {
                     return NotFound();

@@ -1,4 +1,5 @@
-﻿using backend_dotnet7.Core.Entities;
+﻿using backend_dotnet7.Core.Dtos;
+using backend_dotnet7.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace backend_dotnet7.Core.DbContext
 
         public DbSet<Log> Logs { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet <TransactionEntities> TransactionEntities { get; set; }
+        public DbSet <TransactionEntity> TransactionEntities { get; set; }
         public DbSet<SavingViewEntities> SavingViewEntitiess {  get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
