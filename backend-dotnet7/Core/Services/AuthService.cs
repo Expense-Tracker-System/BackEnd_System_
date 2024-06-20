@@ -19,14 +19,21 @@ namespace backend_dotnet7.Core.Services
         private readonly ILogService _logService;
         private readonly IConfiguration _configuration;
         private readonly IUserPasswordConfirmService _userPasswordConfirmService;
+        private readonly IUserEmailService _userEmailService;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,ILogService logService, IConfiguration configuration, IUserPasswordConfirmService userPasswordConfirmService)
+        public AuthService(UserManager<ApplicationUser> userManager, 
+            RoleManager<IdentityRole> roleManager,
+            ILogService logService, 
+            IConfiguration configuration, 
+            IUserPasswordConfirmService userPasswordConfirmService,
+            IUserEmailService userEmailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _logService = logService;
             _configuration = configuration;
             _userPasswordConfirmService = userPasswordConfirmService;
+            _userEmailService = userEmailService;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -71,9 +78,19 @@ namespace backend_dotnet7.Core.Services
                 confirmPassword = registerDto.ConfirmPassword
             };
 
-            var result = await _userPasswordConfirmService.userPasswordConfirm(confirmPasswordDto);
+            var emailValidationResult = await _userEmailService.EmailValidation(registerDto.Email);
 
-            if (result is false)
+            if (emailValidationResult is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Email is invalid"
+                };
+
+            var passwordValidationResult = await _userPasswordConfirmService.userPasswordConfirm(confirmPasswordDto);
+
+            if (passwordValidationResult is false)
                 return new GeneralServiceResponseDto()
                 {
                     IsSucceed = false,
