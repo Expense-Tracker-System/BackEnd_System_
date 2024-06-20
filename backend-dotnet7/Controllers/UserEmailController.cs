@@ -23,7 +23,7 @@ namespace backend_dotnet7.Controllers
         [HttpPut]
         [Route("updateUserEmail")]
         [Authorize]
-        public async Task<ActionResult<UpdateUserEmailResponseDto>> updateUserEmail(UpdateUserEmailDto updateUserEmailDto)
+        public async Task<ActionResult<UpdateUserEmailResponseDto>> updateUserEmail([FromBody] UpdateUserEmailDto updateUserEmailDto)
         {
             try
             {
@@ -37,6 +37,11 @@ namespace backend_dotnet7.Controllers
                 if (isExists is null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, "User does not exists");
+                }
+
+                if(updateUserEmailDto.Email is null)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, "null");
                 }
 
                 var isValid = await _userEmailService.EmailValidation(updateUserEmailDto.Email);
