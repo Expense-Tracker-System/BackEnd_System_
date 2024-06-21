@@ -38,20 +38,13 @@ namespace backend_dotnet7.Infrastructure.Services
 
         public IEnumerable<TransactionDto> GetTransactions(string userName)
         {
-            var transactions = _context.TransactionEntities
-                .Where(t => t.UserName == userName)
-                .Select(t => new TransactionDto
+            var transactions = _context.TransactionEntities.Where(t => t.userName == userName).Select(t => new TransactionDto
                 {
                     Id = t.Id,
                     Amount = t.Amount,
                     Description = t.Description,
                     Date = t.CreatedAt, // Assuming CreatedAt as Date
-                    getLogDto = new GetLogDto // Create a new GetLogDto instance
-                    {
-                        CreatedAt = t.CreatedAt,
-                        Description = t.Description,
-                        UserName = t.UserName
-                    }
+                    userName = userName
                 })
                 .ToList();
 
@@ -61,7 +54,7 @@ namespace backend_dotnet7.Infrastructure.Services
         public async Task<bool> DeleteTransaction(int id, string userName)
         {
             var transaction = await _context.TransactionEntities
-                .FirstOrDefaultAsync(t => t.Id == id && t.UserName == userName);
+                .FirstOrDefaultAsync(t => t.Id == id && t.userName == userName);
 
             if (transaction == null)
                 return false;
@@ -74,7 +67,7 @@ namespace backend_dotnet7.Infrastructure.Services
         public async Task<TransactionDto> UpdateTransaction(int id, TransactionDto transactionDto, string userName)
         {
             var existingTransaction = await _context.TransactionEntities
-                .FirstOrDefaultAsync(t => t.Id == id && t.UserName == userName);
+                .FirstOrDefaultAsync(t => t.Id == id && t.userName == userName);
 
             if (existingTransaction == null)
                 return null;

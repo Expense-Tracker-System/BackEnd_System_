@@ -90,7 +90,6 @@ namespace backend_dotnet7.Controllers
                 }
 
                 var userName = User.Identity.Name;
-                transaction.getLogDto.UserName = userName;
 
                 var updatedTransaction = await _transactionService.UpdateTransaction(id, transaction, userName);
                 if (updatedTransaction == null)
