@@ -16,6 +16,13 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Reminder> Reminders { get; set; }
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<BExpense> BExpenses { get; set; }
+        public DbSet<UserIncome> UserIncomes { get; set; }
+        public DbSet<UserExpense> UserExpenses { get; set; }
+        public DbSet<UserOrganization> UserOrganizations { get; set; }
+        public DbSet<Organization> Organizations { get; set; }
+        public DbSet<OrganizationIncome> OrganizationIncomes { get; set; }
+        public DbSet<OrganizationExpense> OrganizationExpenses { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -63,6 +70,94 @@ namespace backend_dotnet7.Core.DbContext
             {
                e.ToTable("UserRoles");
             });
+
+            // primary key
+            builder.Entity<Log>()
+                .HasKey(log => log.Id);
+
+            // relationship logs
+            builder.Entity<Log>()
+                .HasOne(log => log.applicationUser)
+                .WithMany(u => u.logs)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<Message>()
+                .HasKey(message => message.Id);
+
+            // relationship message
+            builder.Entity<Message>()
+                .HasOne(message => message.applicationUser)
+                .WithMany(u => u.messages)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<UserIncome>()
+                .HasKey(userIncome => userIncome.Id);
+
+            // relationship user income
+            builder.Entity<UserIncome>()
+                .HasOne(income => income.applicationUser)
+                .WithMany(u => u.userIncomes)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<UserExpense>()
+                .HasKey(expense => expense.Id);
+
+            // relationship user expense
+            builder.Entity<UserExpense>()
+                .HasOne(expense => expense.applicationUser)
+                .WithMany(u => u.userExpenses)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<UserOrganization>()
+                .HasKey(uo => new { uo.UserId, uo.OrganizationId });
+
+            // relationship user organization -> user
+            builder.Entity<UserOrganization>()
+                .HasOne(uo => uo.applicationUser)
+                .WithMany(u => u.userOrganizations)
+                .HasForeignKey(uo => uo.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+
+            builder.Entity<UserOrganization>()
+                .HasOne(uo => uo.organization)
+                .WithMany(o => o.userOrganizations)
+                .HasForeignKey(uo => uo.OrganizationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<Organization>()
+                .HasKey(organization => organization.Id);
+
+            // primary key
+            builder.Entity<OrganizationIncome>()
+                .HasKey(orgIn => orgIn.Id);
+
+            // relationship organization
+            builder.Entity<OrganizationIncome>()
+                .HasOne(oi => oi.organization)
+                .WithMany(o => o.organizationIncomes)
+                .HasForeignKey(oi => oi.OrganizationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<OrganizationExpense>()
+                .HasKey(orgEx => orgEx.Id);
+
+            // relationship organization
+            builder.Entity<OrganizationExpense>()
+                .HasOne(oe => oe.organization)
+                .WithMany(o => o.organizationExpenses)
+                .HasForeignKey(oi => oi.OrganizationId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
