@@ -36,7 +36,7 @@ namespace backend_dotnet7.Controllers
         [HttpPost]
         public async Task<ActionResult<List<Budget>>> AddBudget(BudgetDto budget)
         {
-            var result = await _budgetService.AddBudget(budget);
+            var result = await _budgetService.AddBudget(budget, User);
 
             return Ok(result);
         }

@@ -4,24 +4,25 @@ using backend_dotnet7.Core.Dtos.Budget;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace backend_dotnet7.Core.Services
 {
     public class BudgetService : IBudgetService
     {
-            protected readonly ApplicationDbContext dbContext;
-            public BudgetService(ApplicationDbContext context)
-            {
-                dbContext = context;
-            }
-        public async Task<List<Budget>> AddBudget(BudgetDto budget)
+        protected readonly ApplicationDbContext dbContext;
+        public BudgetService(ApplicationDbContext context)
+        {
+            dbContext = context;
+        }
+        public async Task<List<Budget>> AddBudget(BudgetDto budget, ClaimsPrincipal user)
         {
             var newbudget = new Budget
                 {
                 BudgetName = budget.BudgetName,
                 BudgetAmount = budget.BudgetAmount,
                 BudgetDescription = budget.BudgetDescription,
-                UserName = budget.UserName,
+                UserName = user.Identity.Name
                 };
             dbContext.Budgets.Add(newbudget);
             await dbContext.SaveChangesAsync();
