@@ -18,13 +18,22 @@ namespace backend_dotnet7.Core.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogService _logService;
         private readonly IConfiguration _configuration;
+        private readonly IUserPasswordConfirmService _userPasswordConfirmService;
+        private readonly IUserEmailService _userEmailService;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,ILogService logService, IConfiguration configuration)
+        public AuthService(UserManager<ApplicationUser> userManager, 
+            RoleManager<IdentityRole> roleManager,
+            ILogService logService, 
+            IConfiguration configuration, 
+            IUserPasswordConfirmService userPasswordConfirmService,
+            IUserEmailService userEmailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _logService = logService;
             _configuration = configuration;
+            _userPasswordConfirmService = userPasswordConfirmService;
+            _userEmailService = userEmailService;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -63,13 +72,39 @@ namespace backend_dotnet7.Core.Services
                     Message = "UserName Alredy Exists"
                 };
 
+            var confirmPasswordDto = new ConfirmPasswordDto
+            {
+                password = registerDto.Password,
+                confirmPassword = registerDto.ConfirmPassword
+            };
+
+            var emailValidationResult = await _userEmailService.EmailValidation(registerDto.Email);
+
+            if (emailValidationResult is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Email is invalid"
+                };
+
+            var passwordValidationResult = await _userPasswordConfirmService.userPasswordConfirm(confirmPasswordDto);
+
+            if (passwordValidationResult is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Password Confirmation is Failed"
+                };
+
             ApplicationUser newUser = new ApplicationUser()
             {
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 UserName = registerDto.Username,
-                Address = registerDto.Address,
+                PhoneNumber = registerDto.PhoneNumber,
                 Roles = "User",
                 SecurityStamp = Guid.NewGuid().ToString()
             };
@@ -132,8 +167,7 @@ namespace backend_dotnet7.Core.Services
 
             //Return Token and userInfo to front-end
             var NewToken = await GenerateJWTTokenAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, roles);
+            var userInfo = GenerateUserInfoObject(user);
             await _logService.SaveNewLog(user.UserName, "New Login");
 
             return new LoginServiceResponseDto()
@@ -165,8 +199,7 @@ namespace backend_dotnet7.Core.Services
                 return null;
 
             var NewToken = await GenerateJWTTokenAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, roles);
+            var userInfo = GenerateUserInfoObject(user);
             await _logService.SaveNewLog(user.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto()
@@ -186,8 +219,7 @@ namespace backend_dotnet7.Core.Services
 
             foreach(var user in users)
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                var userInfo = GenerateUserInfoObject(user, roles);
+                var userInfo = GenerateUserInfoObject(user);
                 userInfoResults.Add(userInfo);
             }
 
@@ -200,8 +232,7 @@ namespace backend_dotnet7.Core.Services
             if (user is null)
                 return null;
 
-            var role = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, role);
+            var userInfo = GenerateUserInfoObject(user);
 
             return userInfo;
         }
@@ -236,8 +267,7 @@ namespace backend_dotnet7.Core.Services
 
             // generate new JWT token...
             var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var role = await _userManager.GetRolesAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser, role);
+            var userInfo = GenerateUserInfoObject(isExistsUser);
             await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto
@@ -274,8 +304,7 @@ namespace backend_dotnet7.Core.Services
 
             // generate new JWT token...
             var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var role = await _userManager.GetRolesAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser, role);
+            var userInfo = GenerateUserInfoObject(isExistsUser);
             await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto
@@ -332,7 +361,7 @@ namespace backend_dotnet7.Core.Services
 
 
         //GenerateUserInfoObject
-        private UserInfoResult GenerateUserInfoObject(ApplicationUser user, IEnumerable<string> Roles)
+        private UserInfoResult GenerateUserInfoObject(ApplicationUser user)
         {
             return new UserInfoResult()
             {
