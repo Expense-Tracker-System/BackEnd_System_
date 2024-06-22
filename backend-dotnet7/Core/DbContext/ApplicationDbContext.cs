@@ -15,6 +15,7 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Message> Messages { get; set; }
         public DbSet<Reminder> Reminders { get; set; }
         public DbSet<Budget> Budgets { get; set; }
+        public DbSet<BExpense> BExpenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
