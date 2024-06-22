@@ -2,8 +2,9 @@
 {
     public class BudgetDto
     {
-        public string BudgetName { get; set; }
+        public string? BudgetName { get; set; }
         public double BudgetAmount { get; set; }
-        public string BudgetDescription { get; set; }
+        public string? BudgetDescription { get; set; }
+        public string? UserName { get; set; }
     }
 }

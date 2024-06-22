@@ -1,6 +1,7 @@
 ﻿using backend_dotnet7.Core.Dtos.Reminder;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
