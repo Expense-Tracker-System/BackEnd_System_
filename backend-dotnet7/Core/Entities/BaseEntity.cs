@@ -2,7 +2,7 @@
 {
     public class BaseEntity<TID> //generic data type
     {
-        public TID Id { get; set; }
+        public TID? Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
