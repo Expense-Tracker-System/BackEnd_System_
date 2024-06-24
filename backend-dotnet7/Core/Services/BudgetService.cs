@@ -22,7 +22,7 @@ namespace backend_dotnet7.Core.Services
                 BudgetName = budget.BudgetName,
                 BudgetAmount = budget.BudgetAmount,
                 BudgetDescription = budget.BudgetDescription,
-                UserName = user.Identity.Name
+                UserName = budget.UserName // ahanna
                 };
             dbContext.Budgets.Add(newbudget);
             await dbContext.SaveChangesAsync();
@@ -53,10 +53,10 @@ namespace backend_dotnet7.Core.Services
                 {
                     var b = new BExpenseDto
                     {
-                        BudgetId = expense.BudgetId,
+                        BudgetId = expense.BExpenseId,
                         BExpenseAmount = expense.BExpenseAmount,
-                        BExpenseName = expense.BExpenseName
-
+                        BExpenseName = expense.BExpenseName,
+                        ExpenseId = expense.BExpenseId,
                     };
                     expensesdto.Add(b);
                 }
@@ -80,13 +80,42 @@ namespace backend_dotnet7.Core.Services
             return getbudget;
         }
 
-        public async Task<Budget?> GetSingleBudget(int id)
+        public async Task<getbudgetDto?> GetSingleBudget(int id)
         {
             var budget = await dbContext.Budgets.FindAsync(id);
 
             if (budget is null) return null;
 
-            return budget;
+            var expenses = await dbContext.BExpenses.Where(e => e.BudgetId == budget.BudgetId).ToListAsync();
+            var expensesdto = new List<BExpenseDto>();
+            foreach (var expense in expenses)
+            {
+                var b = new BExpenseDto
+                {
+                    BudgetId = expense.BudgetId,
+                    BExpenseAmount = expense.BExpenseAmount,
+                    BExpenseName = expense.BExpenseName,
+                    ExpenseId=expense.BExpenseId
+                };
+                expensesdto.Add(b);
+            }
+            var totalExpense = await dbContext.BExpenses
+                                .Where(e => e.BudgetId == budget.BudgetId)
+                                .SumAsync(e => e.BExpenseAmount);
+
+            var a = new getbudgetDto
+            {
+                Id = budget.BudgetId,
+                budgetName = budget.BudgetName,
+                budgetAmount = budget.BudgetAmount,
+                budgetDescription = budget.BudgetDescription,
+                remain = budget.BudgetAmount - totalExpense,
+                spent = totalExpense,
+                expenses = expensesdto,
+
+            };
+
+            return a;
         }
 
         public async Task<List<Budget>?> UpdateBudget(int id, BudgetDto request)
