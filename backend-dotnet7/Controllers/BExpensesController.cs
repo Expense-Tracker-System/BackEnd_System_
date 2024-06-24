@@ -42,7 +42,7 @@ namespace backend_dotnet7.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("deleteexpense")]
         public async Task<ActionResult<List<BExpense>>> DeleteBExpense(int id)
         {
             var result = await _bexpenseService.DeleteBExpense(id);

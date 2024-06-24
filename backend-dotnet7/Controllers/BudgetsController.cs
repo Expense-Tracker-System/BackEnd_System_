@@ -24,8 +24,8 @@ namespace backend_dotnet7.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Budget>> GetSingleBudget(int id)
+        [HttpGet("getsinglebudget")]
+        public async Task<ActionResult<getbudgetDto>> GetSingleBudget(int id)
         {
             var result = await _budgetService.GetSingleBudget(id);
             if (result is null)
