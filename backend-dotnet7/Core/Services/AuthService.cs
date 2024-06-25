@@ -20,13 +20,15 @@ namespace backend_dotnet7.Core.Services
         private readonly IConfiguration _configuration;
         private readonly IUserPasswordConfirmService _userPasswordConfirmService;
         private readonly IUserEmailService _userEmailService;
+        private readonly IUserPhoneNumberService _userPhoneNumberService;
 
         public AuthService(UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole> roleManager,
             ILogService logService, 
             IConfiguration configuration, 
             IUserPasswordConfirmService userPasswordConfirmService,
-            IUserEmailService userEmailService)
+            IUserEmailService userEmailService,
+            IUserPhoneNumberService userPhoneNumberService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -34,6 +36,7 @@ namespace backend_dotnet7.Core.Services
             _configuration = configuration;
             _userPasswordConfirmService = userPasswordConfirmService;
             _userEmailService = userEmailService;
+            _userPhoneNumberService = userPhoneNumberService;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -97,6 +100,28 @@ namespace backend_dotnet7.Core.Services
                     IsSucceed = false,
                     StatusCode = 409,
                     Message = "Already has account using this Email"
+                };
+            }
+
+            var validPhoneNumber = await _userPhoneNumberService.PhoneNumberValidation(registerDto.PhoneNumber);
+
+            if (validPhoneNumber is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Phone Number is invalid"
+                };
+
+            var isPhoneNumberUnique = await _userPhoneNumberService.IsPhoneNumberUnique(registerDto.PhoneNumber);
+
+            if (isPhoneNumberUnique is false)
+            {
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 409,
+                    Message = "Already has account using this Phone Number"
                 };
             }
 
