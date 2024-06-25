@@ -10,10 +10,12 @@ namespace backend_dotnet7.Core.Services
     public class OutMessageService : IOutMessageService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUserEmailService _userEmailService;
 
-        public OutMessageService(ApplicationDbContext context)
+        public OutMessageService(ApplicationDbContext context, IUserEmailService userEmailService)
         {
             _context = context;
+            _userEmailService = userEmailService;
         }
 
         public async Task<GeneralServiceResponseDto> CreateMessageAsync(CreateOutMessageDto createOutMessageDto)
@@ -25,6 +27,18 @@ namespace backend_dotnet7.Core.Services
                     IsSucceed = false,
                     StatusCode = 400,
                     Message = "Email or Text can't be null"
+                };
+            }
+
+            var result = await _userEmailService.EmailValidation(createOutMessageDto.Email);
+
+            if(result is false)
+            {
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "Email is Invalid"
                 };
             }
 
