@@ -88,6 +88,18 @@ namespace backend_dotnet7.Core.Services
                     Message = "User Email is invalid"
                 };
 
+            var isUnique = await _userEmailService.IsEmailUnique(registerDto.Email);
+
+            if (isUnique is false)
+            {
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 409,
+                    Message = "Already has account using this Email"
+                };
+            }
+
             var passwordValidationResult = await _userPasswordConfirmService.userPasswordConfirm(confirmPasswordDto);
 
             if (passwordValidationResult is false)
