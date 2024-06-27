@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend_dotnet7.Controllers
 {
-    [Route("api/Category/{CategoryId}/transactions")]
+    [Route("api/Categories/{CategoryId}/transactions")]
     [ApiController]
   
         public class TransactionsController : ControllerBase

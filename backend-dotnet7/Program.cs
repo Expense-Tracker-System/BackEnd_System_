@@ -19,7 +19,7 @@ builder.Services
     .AddJsonOptions(options =>
      {
          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-     });
+     }).AddXmlDataContractSerializerFormatters();
 
 
 
@@ -32,9 +32,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 //Dependency Injection
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITransactionReposatory, TransactionSqlServerService>();
+builder.Services.AddScoped<ICategoryReposatory, CategoriesSqlServerService>();
 
 
 //Add Identity

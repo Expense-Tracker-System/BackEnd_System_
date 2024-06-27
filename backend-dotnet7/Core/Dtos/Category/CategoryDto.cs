@@ -2,6 +2,7 @@
 {
     public class CategoryDto
     {
+       
         public string IconwithTitle { get; set; } = "";
 
 
