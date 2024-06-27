@@ -30,33 +30,18 @@ namespace backend_dotnet7.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if(userId is null)
                 {
-                    return new GeneralServiceResponseDto()
-                    {
-                        IsSucceed = false,
-                        StatusCode = 404,
-                        Message = "can't find user, please contact Admin"
-                    };
+                    return StatusCode(StatusCodes.Status401Unauthorized, "User is not Authorized");
                 }
 
                 var isExist = await _userManager.FindByIdAsync(userId);
                 if(isExist is null)
                 {
-                    return new GeneralServiceResponseDto()
-                    {
-                        IsSucceed = false,
-                        StatusCode = 404,
-                        Message = "User deos not exist"
-                    };
+                    return StatusCode(StatusCodes.Status404NotFound, "User is not found");
                 }
 
                 if (string.IsNullOrEmpty(updateUserPasswordDto.userPasswordOld))
                 {
-                    return new GeneralServiceResponseDto()
-                    {
-                        IsSucceed = false,
-                        StatusCode = 400,
-                        Message = "Current password can't be null"
-                    };
+                    return StatusCode(StatusCodes.Status400BadRequest, "User password can't be null");
                 }
                 
                 // check old password is correct
@@ -64,22 +49,12 @@ namespace backend_dotnet7.Controllers
 
                 if(result1 is false)
                 {
-                    return new GeneralServiceResponseDto()
-                    {
-                        IsSucceed = false,
-                        StatusCode = 400,
-                        Message = "Current Password doesn't match"
-                    };
+                    return StatusCode(StatusCodes.Status400BadRequest, "User old password doesn't match");
                 }
 
                 if(string.IsNullOrEmpty(updateUserPasswordDto.userPasswordNew) || string.IsNullOrEmpty(updateUserPasswordDto.confirmUserPasswordNew))
                 {
-                    return new GeneralServiceResponseDto()
-                    {
-                        IsSucceed = false,
-                        StatusCode = 400,
-                        Message = "Newly Password can't be null"
-                    };
+                    return StatusCode(StatusCodes.Status400BadRequest, "User new password can't be null");
                 }
 
                 ConfirmPasswordDto confirmPasswordDto = new ConfirmPasswordDto()
@@ -93,24 +68,14 @@ namespace backend_dotnet7.Controllers
 
                 if(result2 is false)
                 {
-                    return new GeneralServiceResponseDto()
-                    {
-                        IsSucceed = false,
-                        StatusCode = 400,
-                        Message = "New password does not match"
-                    };
+                    return StatusCode(StatusCodes.Status400BadRequest, "User confirm password is Failed");
                 }
 
                 var result3 = await _userManager.ChangePasswordAsync(isExist, updateUserPasswordDto.userPasswordOld, updateUserPasswordDto.userPasswordNew);
 
                 if (!result3.Succeeded)
                 {
-                    return new GeneralServiceResponseDto()
-                    {
-                        IsSucceed = false,
-                        StatusCode = 400,
-                        Message = "Update User Password Failed"
-                    };
+                    return StatusCode(StatusCodes.Status400BadRequest, "Update user password is Failed");
                 }
 
                 return new GeneralServiceResponseDto()
