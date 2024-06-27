@@ -22,8 +22,8 @@ namespace backend_dotnet7.Core.Services
                 BudgetName = budget.BudgetName,
                 BudgetAmount = budget.BudgetAmount,
                 BudgetDescription = budget.BudgetDescription,
-                UserName = budget.UserName // ahanna
-                };
+                UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value, // ahanna
+            };
             dbContext.Budgets.Add(newbudget);
             await dbContext.SaveChangesAsync();
             return await dbContext.Budgets.ToListAsync();
@@ -41,9 +41,10 @@ namespace backend_dotnet7.Core.Services
             return await dbContext.Budgets.ToListAsync();
         }
 
-        public async Task<List<getbudgetDto>> GetAllBudgets(string username)
+        public async Task<List<getbudgetDto>> GetAllBudgets(ClaimsPrincipal User)
         {
-            var budgets = await dbContext.Budgets.Where(e=>e.UserName==username).ToListAsync();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var budgets = await dbContext.Budgets.Where(e=>e.UserId== userId).ToListAsync();
             var getbudget = new List<getbudgetDto>();
             foreach (var budget in budgets)
             {

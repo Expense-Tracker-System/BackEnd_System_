@@ -1,8 +1,10 @@
 ﻿using backend_dotnet7.Core.DbContext;
+using backend_dotnet7.Core.Dtos.Log;
 using backend_dotnet7.Core.Dtos.Reminder;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace backend_dotnet7.Core.Services
 {
@@ -13,7 +15,7 @@ namespace backend_dotnet7.Core.Services
         {
             dbContext = context;
         }
-        public async Task<List<Reminder>> AddReminder(ReminderDto reminder)
+        public async Task<List<Reminder>> AddReminder(ReminderDto reminder , ClaimsPrincipal user)
         {
             var newrem = new Reminder
             {
@@ -21,7 +23,8 @@ namespace backend_dotnet7.Core.Services
                 ReminderAmount = reminder.ReminderAmount,
                 ReminderDescription = reminder.ReminderDescription,
                 ReminderstartDate = reminder.ReminderstartDate,
-                ReminderendDate = reminder.ReminderendDate
+                ReminderendDate = reminder.ReminderendDate,
+                UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value,
             };
             dbContext.Reminders.Add(newrem);
             await dbContext.SaveChangesAsync();
@@ -40,9 +43,23 @@ namespace backend_dotnet7.Core.Services
             return await dbContext.Reminders.ToListAsync();
         }
 
-        public async Task<List<Reminder>> GetAllReminders()
+        public async Task<List<Reminder>> GetAllReminders(ClaimsPrincipal User)
         {
-            var reminders = await dbContext.Reminders.ToListAsync();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var reminders = await dbContext.Reminders
+                .Where(q => q.UserId == userId)
+                .Select(q => new Reminder()
+                {
+                    ReminderId = q.ReminderId,
+                    ReminderName = q.ReminderName,
+                    ReminderAmount = q.ReminderAmount,
+                    ReminderDescription = q.ReminderDescription,
+                    ReminderstartDate = q.ReminderstartDate,
+                    ReminderendDate = q.ReminderendDate
+                })
+                .ToListAsync();
+
             return reminders;
         }
 
