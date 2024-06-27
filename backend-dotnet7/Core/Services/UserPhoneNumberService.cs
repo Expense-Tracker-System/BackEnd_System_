@@ -20,7 +20,7 @@ namespace backend_dotnet7.Core.Services
 
         public Task<bool> PhoneNumberValidation(string phoneNumber)
         {
-            Regex phoneNumberRegex = new Regex(@"^\+?[1-9]\d{1,14}$", RegexOptions.Compiled);
+            Regex phoneNumberRegex = new Regex(@"^0\d{9}$", RegexOptions.Compiled);
 
             return Task.FromResult(phoneNumberRegex.IsMatch(phoneNumber));
         }
