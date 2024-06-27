@@ -30,18 +30,18 @@ namespace backend_dotnet7.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId is null)
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, "Can't find user, Please contact admin");
+                    return StatusCode(StatusCodes.Status401Unauthorized, "User is not Authorized");
                 }
 
                 var isExists = await _userManager.FindByIdAsync(userId);
                 if (isExists is null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, "User does not exists");
+                    return StatusCode(StatusCodes.Status404NotFound, "Can't find User");
                 }
 
                 if(updateUserEmailDto.Email is null)
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, "null");
+                    return StatusCode(StatusCodes.Status400BadRequest, "Email can't be null");
                 }
 
                 var isValid = await _userEmailService.EmailValidation(updateUserEmailDto.Email);
@@ -49,6 +49,13 @@ namespace backend_dotnet7.Controllers
                 if (!isValid)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, "User Email is invalid");
+                }
+
+                var isUnique = await _userEmailService.IsEmailUnique(updateUserEmailDto.Email);
+
+                if(isUnique is false)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, "User Email is not Unique");
                 }
 
                 isExists.Email = updateUserEmailDto.Email;
