@@ -18,14 +18,16 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Reminder>>> GetAllReminders()
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Reminder>>> GetAllReminders()
         {
-            var result = await _reminderService.GetAllReminders();
+            var result = await _reminderService.GetAllReminders(User);
 
             return Ok(result);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<List<Reminder>>> GetSingleReminder(int id)
         {
             var result = await _reminderService.GetSingleReminder(id);
@@ -35,13 +37,16 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<List<Reminder>>> AddReminder(ReminderDto reminder)
         {
-            var result = await _reminderService.AddReminder(reminder);
+            var result = await _reminderService.AddReminder(reminder , User);
             return Ok(result);
+
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<List<Reminder>>> UpdateReminder(int id, ReminderDto request)
         {
             var result = await _reminderService.UpdateReminder(id, request);
@@ -51,6 +56,7 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<List<Reminder>>> DeleteReminder(int id)
         {
             var result = await _reminderService.DeleteReminder(id);

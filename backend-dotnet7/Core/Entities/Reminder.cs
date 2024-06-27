@@ -12,7 +12,7 @@ namespace backend_dotnet7.Core.Entities
         public DateTime ReminderendDate { get; set; }
 
         [ForeignKey(nameof(User))]
-        public string? UserName { get; set; }
+        public string? UserId { get; set; }
 
         public virtual ApplicationUser User { get; set; }
     }
