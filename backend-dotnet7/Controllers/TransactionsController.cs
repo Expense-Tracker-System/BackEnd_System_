@@ -1,4 +1,5 @@
 ﻿using backend_dotnet7.Core.Entities;
+using backend_dotnet7.Core.Interfaces;
 using backend_dotnet7.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,11 @@ namespace backend_dotnet7.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-        private TransactionService _transactionService;
+        private readonly ITransactionReposatory _transactionService;
 
-        public TransactionsController()
+        public TransactionsController(ITransactionReposatory reposatory)
         {
-            _transactionService = new TransactionService();
+            _transactionService = reposatory;
         }
         [HttpGet("{id?}")]
         public IActionResult GetTransactions(int? id) 

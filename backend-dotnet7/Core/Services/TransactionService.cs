@@ -1,8 +1,9 @@
 ﻿using backend_dotnet7.Core.Entities;
+using backend_dotnet7.Core.Interfaces;
 
 namespace backend_dotnet7.Core.Services
 {
-    public class TransactionService
+    public class TransactionService : ITransactionReposatory
     {
         public List<Transaction> AllTransaction()
         {
