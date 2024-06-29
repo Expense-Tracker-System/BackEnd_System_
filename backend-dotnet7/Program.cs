@@ -16,12 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services
-    .AddControllers()
+    .AddControllers();
     // Enum Configuration
-    .AddJsonOptions(options =>
-     {
-         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-     });
+   // .AddJsonOptions(options =>
+    // {
+      //   options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+     //});
 
 
 
