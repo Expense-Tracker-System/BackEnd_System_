@@ -7,6 +7,10 @@ namespace backend_dotnet7.Core.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> //generic type
     {
+        public ApplicationDbContext()
+        {
+        }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
@@ -22,6 +26,7 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationIncome> OrganizationIncomes { get; set; }
         public DbSet<OrganizationExpense> OrganizationExpenses { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -69,6 +74,14 @@ namespace backend_dotnet7.Core.DbContext
             builder.Entity<IdentityUserRole<string>>(e =>
             {
                e.ToTable("UserRoles");
+            });
+
+            builder.Entity<Transaction>().HasData(new Transaction {
+                Id = 4,
+                Amount = 800,
+                Note = "Ileccity Bill",
+                Created = DateTime.Now,
+                Status = TransactionStatus.Completed
             });
 
             // primary key
@@ -159,5 +172,6 @@ namespace backend_dotnet7.Core.DbContext
                 .HasForeignKey(oi => oi.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+            
     }
 }
