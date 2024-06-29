@@ -16,12 +16,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services
-    .AddControllers();
+    .AddControllers(options => {
+        options.ReturnHttpNotAcceptable = true;
+    }).AddXmlDataContractSerializerFormatters()
     // Enum Configuration
-   // .AddJsonOptions(options =>
-    // {
-      //   options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-     //});
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 
 
 
@@ -48,6 +51,7 @@ builder.Services.AddScoped<IUserEmailService, UserEmailService>();
 builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
 builder.Services.AddScoped<ITransactionReposatory, TransactionSqlService>();
+builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
 
 // registers CORS services during service configuration
 //  global CORS settings

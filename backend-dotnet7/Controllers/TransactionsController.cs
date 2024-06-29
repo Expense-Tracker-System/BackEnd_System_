@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend_dotnet7.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/transactions")]
     [ApiController]
     public class TransactionsController : ControllerBase
     {
@@ -17,13 +17,21 @@ namespace backend_dotnet7.Controllers
         {
             _transactionService = reposatory;
         }
-        [HttpGet("{id?}")]
-        public IActionResult GetTransactions(int? id) 
+        [HttpGet]
+        public IActionResult GetTransactions() 
         {
             var trans = _transactionService.AllTransaction();
-            if (id == null) { return Ok(trans); }
-           var tran = trans.Where(x => x.Id == id);
-            return Ok(tran);
+            
+           
+            return Ok(trans);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetTransaction(int id)
+        {
+            var transaction = _transactionService.GetTransaction(id);
+            if (transaction == null) { return NotFound(); }
+            return Ok(transaction);
         }
         //Get Transactions
        

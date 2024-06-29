@@ -18,5 +18,10 @@ namespace backend_dotnet7.Core.Services
         {
             return _context.Transactions.ToList();
         }
+
+        public Transaction GetTransaction(int id)
+        {
+            return _context.Transactions.Find(id);
+        }
     }
 }

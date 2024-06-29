@@ -40,5 +40,10 @@ namespace backend_dotnet7.Core.Services
 
             return transactions;
         }
+
+        public Transaction GetTransaction(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
