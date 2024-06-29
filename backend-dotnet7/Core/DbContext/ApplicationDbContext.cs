@@ -23,6 +23,7 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<OrganizationIncome> OrganizationIncomes { get; set; }
         public DbSet<OrganizationExpense> OrganizationExpenses { get; set; }
         public DbSet<OutMessage> OutMessages { get; set; }
+        public DbSet<DeactivateUserAccount> DeactivateUserAccounts { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -127,7 +128,7 @@ namespace backend_dotnet7.Core.DbContext
                 .HasForeignKey(uo => uo.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
             
-
+            // relationship user organization -> organization
             builder.Entity<UserOrganization>()
                 .HasOne(uo => uo.organization)
                 .WithMany(o => o.userOrganizations)
@@ -157,12 +158,23 @@ namespace backend_dotnet7.Core.DbContext
             builder.Entity<OrganizationExpense>()
                 .HasOne(oe => oe.organization)
                 .WithMany(o => o.organizationExpenses)
-                .HasForeignKey(oi => oi.OrganizationId)
+                .HasForeignKey(oe => oe.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // primary key
             builder.Entity<OutMessage>()
                 .HasKey(outMessage => outMessage.Id);
+
+            // primary key
+            builder.Entity<DeactivateUserAccount>()
+                .HasKey(deUserAcc => deUserAcc.Id);
+
+            // relationship deactivate account
+            builder.Entity<DeactivateUserAccount>()
+                .HasOne(deuacc => deuacc.applicationUser)
+                .WithMany(u => u.deactivateUserAccounts)
+                .HasForeignKey(deuacc => deuacc.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

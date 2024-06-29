@@ -187,13 +187,6 @@ namespace backend_dotnet7.Core.Services
                 return null;
             }
 
-            //Find Correct Mode
-            if(!String.Equals(loginDto.Mode, user.Roles, StringComparison.OrdinalIgnoreCase))
-{
-                return null;
-            }
-
-
             //Check password of user
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
