@@ -400,6 +400,7 @@ namespace backend_dotnet7.Core.Services
                 LastName = user.LastName,
                 UserName = user.UserName,
                 Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
                 CreatedAt = user.CreatedAt,
                 Roles = user.Roles
             };
