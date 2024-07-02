@@ -12,8 +12,8 @@ using backend_dotnet7.Core.DbContext;
 namespace backend_dotnet7.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240617164553_save")]
-    partial class save
+    [Migration("20240621104605_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -332,7 +332,7 @@ namespace backend_dotnet7.Migrations
                     b.ToTable("SavingViewEntitiess");
                 });
 
-            modelBuilder.Entity("backend_dotnet7.Core.Entities.TransactionEntities", b =>
+            modelBuilder.Entity("backend_dotnet7.Core.Entities.TransactionEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -343,10 +343,13 @@ namespace backend_dotnet7.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

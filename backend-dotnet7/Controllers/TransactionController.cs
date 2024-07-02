@@ -19,8 +19,9 @@ namespace backend_dotnet7.Controllers
             _transactionService = transactionService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddTransaction([FromBody] TransactionDto transaction)
+        [HttpPost("AddTransaction")]
+
+        public async Task<IActionResult> AddTransaction([FromBody] GetTransactionDto getTransactionDto)
         {
             try
             {
@@ -29,10 +30,15 @@ namespace backend_dotnet7.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var userName = User.Identity.Name;
-                //transaction.getLogDto.UserName = userName;
+                var transactionDto = new TransactionDto
+                {
+                    Id = getTransactionDto.Id,
+                    Amount = getTransactionDto.Amount,
+                    Description = getTransactionDto.Description,
+                    userName = User.Identity.Name
+                };
 
-                var result = await _transactionService.AddTransaction(transaction, userName);
+                var result = await _transactionService.AddTransaction(transactionDto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -42,23 +48,20 @@ namespace backend_dotnet7.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult GetTransactions()
+       
+        [HttpGet("GetTransactions")]
+
+        public async Task<IActionResult> GetTransactions()
         {
-            try
-            {
                 var userName = User.Identity.Name;
-                var transactions = _transactionService.GetTransactions(userName);
+                var transactions =  _transactionService.GetTransactions(userName);
                 return Ok(transactions);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                return StatusCode(500, "Internal server error");
-            }
+            
         }
 
-        [HttpDelete("{id}")]
+       
+        [HttpDelete("DeleteTransaction")]
+
         public async Task<IActionResult> DeleteTransaction(int id)
         {
             try
@@ -79,7 +82,9 @@ namespace backend_dotnet7.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        
+        [HttpPut("UpdateTransaction")]
+
         public async Task<IActionResult> UpdateTransaction(int id, [FromBody] TransactionDto transaction)
         {
             try

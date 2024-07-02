@@ -19,23 +19,38 @@ namespace backend_dotnet7.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<TransactionDto> AddTransaction(TransactionDto transaction, string userName)
+        public async Task<TransactionDto> AddTransaction(TransactionDto transaction)
         {
             var entity = new TransactionEntity
             {
+                Id = transaction.Id,
                 Amount = transaction.Amount,
                 Description = transaction.Description,
-                userName = userName, // Assign the UserName from DTO
-                CreatedAt = DateTime.Now // Or use transaction.getLogDto.CreatedAt
+                userName = transaction.userName, // Assign the UserName from DTO
             };
 
             _context.TransactionEntities.Add(entity);
             await _context.SaveChangesAsync();
 
-            transaction.Id = entity.Id; // Set the ID of the created transaction
             return transaction;
         }
 
+        public Task<bool> DeleteTransaction(int id, string userName)
+        {
+            throw new NotImplementedException();
+        }
+
+        //public IEnumerable<TransactionDto> GetTransactions(string userName)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public Task<TransactionDto> UpdateTransaction(int id, TransactionDto transaction, string userName)
+        {
+            throw new NotImplementedException();
+        }
+
+        
         public IEnumerable<TransactionDto> GetTransactions(string userName)
         {
             var transactions = _context.TransactionEntities.Where(t => t.userName == userName).Select(t => new TransactionDto
@@ -43,14 +58,14 @@ namespace backend_dotnet7.Infrastructure.Services
                     Id = t.Id,
                     Amount = t.Amount,
                     Description = t.Description,
-                    Date = t.CreatedAt, // Assuming CreatedAt as Date
+                     // Assuming CreatedAt as Date
                     userName = userName
                 })
                 .ToList();
 
             return transactions;
         }
-
+        /*
         public async Task<bool> DeleteTransaction(int id, string userName)
         {
             var transaction = await _context.TransactionEntities
@@ -81,7 +96,8 @@ namespace backend_dotnet7.Infrastructure.Services
 
             return transactionDto;
         }
+        */
 
-       
+
     }
 }

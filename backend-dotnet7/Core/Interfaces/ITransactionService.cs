@@ -7,7 +7,7 @@ namespace backend_dotnet7.Core.Interfaces
 {
     public interface ITransactionService
     {
-        Task<TransactionDto> AddTransaction(TransactionDto transaction, string userName);
+        Task<TransactionDto> AddTransaction(TransactionDto transaction);
         IEnumerable<TransactionDto> GetTransactions(string userName);
         Task<bool> DeleteTransaction(int id, string userName);
         Task<TransactionDto> UpdateTransaction(int id, TransactionDto transaction, string userName);
