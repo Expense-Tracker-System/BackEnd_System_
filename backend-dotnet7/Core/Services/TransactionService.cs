@@ -5,7 +5,7 @@ namespace backend_dotnet7.Core.Services
 {
     public class TransactionService : ITransactionReposatory
     {
-        public List<Transaction> AllTransaction()
+        public List<Transaction> AllTransaction(int CategoryId)
         {
             var transactions = new List<Transaction>();
 
@@ -41,7 +41,7 @@ namespace backend_dotnet7.Core.Services
             return transactions;
         }
 
-        public Transaction GetTransaction(int id)
+        public Transaction GetTransaction(int CategoryId, int id)
         {
             throw new NotImplementedException();
         }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend_dotnet7.Core.DbContext;
 
@@ -11,9 +12,11 @@ using backend_dotnet7.Core.DbContext;
 namespace backend_dotnet7.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240702165448_HasData")]
+    partial class HasData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -606,7 +609,7 @@ namespace backend_dotnet7.Migrations
                             Id = 4,
                             Amount = 800,
                             CategoryId = 1,
-                            Created = new DateTime(2024, 7, 2, 23, 13, 55, 908, DateTimeKind.Local).AddTicks(9145),
+                            Created = new DateTime(2024, 7, 2, 22, 24, 48, 708, DateTimeKind.Local).AddTicks(1552),
                             Note = "Ileccity Bill",
                             Status = 2
                         },
@@ -615,7 +618,7 @@ namespace backend_dotnet7.Migrations
                             Id = 1,
                             Amount = 200,
                             CategoryId = 2,
-                            Created = new DateTime(2024, 7, 2, 23, 13, 55, 908, DateTimeKind.Local).AddTicks(9157),
+                            Created = new DateTime(2024, 7, 2, 22, 24, 48, 708, DateTimeKind.Local).AddTicks(1571),
                             Note = "Elecity Bill",
                             Status = 2
                         },
@@ -624,7 +627,7 @@ namespace backend_dotnet7.Migrations
                             Id = 2,
                             Amount = 500,
                             CategoryId = 3,
-                            Created = new DateTime(2024, 7, 2, 23, 13, 55, 908, DateTimeKind.Local).AddTicks(9159),
+                            Created = new DateTime(2024, 7, 2, 22, 24, 48, 708, DateTimeKind.Local).AddTicks(1573),
                             Note = "water Bill",
                             Status = 2
                         },
@@ -633,7 +636,7 @@ namespace backend_dotnet7.Migrations
                             Id = 3,
                             Amount = 1000,
                             CategoryId = 4,
-                            Created = new DateTime(2024, 7, 2, 23, 13, 55, 908, DateTimeKind.Local).AddTicks(9160),
+                            Created = new DateTime(2024, 7, 2, 22, 24, 48, 708, DateTimeKind.Local).AddTicks(1575),
                             Note = "Medicine",
                             Status = 2
                         });
@@ -877,7 +880,7 @@ namespace backend_dotnet7.Migrations
             modelBuilder.Entity("backend_dotnet7.Core.Entities.Transaction", b =>
                 {
                     b.HasOne("backend_dotnet7.Core.Entities.Category", "Category")
-                        .WithMany("Transactions")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -944,11 +947,6 @@ namespace backend_dotnet7.Migrations
             modelBuilder.Entity("backend_dotnet7.Core.Entities.Budget", b =>
                 {
                     b.Navigation("Bexpenses");
-                });
-
-            modelBuilder.Entity("backend_dotnet7.Core.Entities.Category", b =>
-                {
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("backend_dotnet7.Core.Entities.Organization", b =>

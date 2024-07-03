@@ -4,7 +4,7 @@ namespace backend_dotnet7.Core.Interfaces
 {
     public interface ITransactionReposatory
     {
-        public List<Transaction> AllTransaction();
-        public Transaction GetTransaction(int id);
+        public List<Transaction> AllTransaction(int CategoryId);
+        public Transaction GetTransaction(int CategoryId,int id);
     }
 }

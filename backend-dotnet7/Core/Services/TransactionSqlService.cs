@@ -14,14 +14,14 @@ namespace backend_dotnet7.Core.Services
             _context = context;
         }
 
-        public List<Transaction> AllTransaction()
+        public List<Transaction> AllTransaction(int CategoryId)
         {
-            return _context.Transactions.ToList();
+            return _context.Transactions.Where(t => t.CategoryId == CategoryId).ToList();
         }
 
-        public Transaction GetTransaction(int id)
+        public Transaction GetTransaction(int CategoryId, int id)
         {
-            return _context.Transactions.Find(id);
+            return _context.Transactions.FirstOrDefault(t => t.Id == id && t.CategoryId == CategoryId);
         }
     }
 }

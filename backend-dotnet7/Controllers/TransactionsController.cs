@@ -1,4 +1,6 @@
-﻿using backend_dotnet7.Core.Entities;
+﻿using AutoMapper;
+using backend_dotnet7.Core.Dtos.Transactions;
+using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using backend_dotnet7.Core.Services;
 using Microsoft.AspNetCore.Http;
@@ -7,31 +9,54 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend_dotnet7.Controllers
 {
-    [Route("api/transactions")]
+    [Route("api/categories/{CategoryId}/transactions")]
     [ApiController]
     public class TransactionsController : ControllerBase
     {
         private readonly ITransactionReposatory _transactionService;
+       
 
         public TransactionsController(ITransactionReposatory reposatory)
         {
             _transactionService = reposatory;
+           
         }
         [HttpGet]
-        public IActionResult GetTransactions() 
+        public ActionResult<ICollection<TransactionDto>> GetTransactions(int CategoryId) 
         {
-            var trans = _transactionService.AllTransaction();
             
+            var transactions = _transactionService.AllTransaction(CategoryId);
+            
+            var transactionsDto = new List<TransactionDto>();
+
+            foreach (var transaction in transactions) {
+                transactionsDto.Add(new TransactionDto { 
+                    Id = transaction.Id,
+                    Amount = transaction.Amount,
+                    Created = transaction.Created,
+                    Note = transaction.Note,
+                    CategoryId=transaction.CategoryId,
+                   Status=transaction.Status,
+                });
+            }
            
-            return Ok(trans);
+            return Ok(transactionsDto);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetTransaction(int id)
+        public ActionResult<TransactionDto> GetTransaction(int CategoryId, int id)
         {
-            var transaction = _transactionService.GetTransaction(id);
+            var transaction = _transactionService.GetTransaction(CategoryId,id);
             if (transaction == null) { return NotFound(); }
-            return Ok(transaction);
+            var transactionDto = new TransactionDto();
+            transactionDto.Id = transaction.Id;
+            transactionDto.Amount = transaction.Amount;
+            transactionDto.Created = transaction.Created;
+            transactionDto.Note = transaction.Note;
+            transactionDto.CategoryId = transaction.CategoryId;
+            transactionDto.Status = transaction.Status;
+
+            return Ok(transactionDto);
         }
         //Get Transactions
        

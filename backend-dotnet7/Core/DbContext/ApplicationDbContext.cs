@@ -116,10 +116,10 @@ namespace backend_dotnet7.Core.DbContext
             });
 
             builder.Entity<Category>().HasData(new Category[] { 
-                new Category{ Id = 1,Title="Eleccity Bill"},
-                new Category{ Id = 2,Title="Water bill" },
-                new Category{ Id = 3,Title="Travel" },
-                new Category{ Id = 4,Title="Medicine" }
+                new Category{ Id = 1,Title="Eleccity Bill", Icon="💡"},
+                new Category{ Id = 2,Title="Water bill", Icon="🚰" },
+                new Category{ Id = 3,Title="Travel", Icon="✈️" },
+                new Category{ Id = 4,Title="Medicine", Icon="💊" }
             });
 
             // primary key
