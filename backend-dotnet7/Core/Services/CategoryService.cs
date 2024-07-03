@@ -16,7 +16,6 @@ namespace backend_dotnet7.Core.Services
             return _context.categories.ToList();
 
         }
-
         public Category GetCategory(int id)
         {
             return _context.categories.Find(id);
