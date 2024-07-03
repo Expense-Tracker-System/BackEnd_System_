@@ -3,6 +3,7 @@ using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using backend_dotnet7.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,12 +17,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services
-    .AddControllers()
+    .AddControllers(options => {
+        options.ReturnHttpNotAcceptable = true;
+    }).AddXmlDataContractSerializerFormatters()
     // Enum Configuration
     .AddJsonOptions(options =>
-     {
-         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-     });
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 
 
 
@@ -32,6 +36,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+//AutoMapper DI
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //Dependency Injection
 // .AddSingleton    -> only one Instance for application...
@@ -47,8 +53,9 @@ builder.Services.AddScoped<IUserImageService, UserImageService>();
 builder.Services.AddScoped<IUserEmailService, UserEmailService>();
 builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
-builder.Services.AddScoped<IOutMessageService, OutMessageService>();
-builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
+builder.Services.AddScoped<ITransactionReposatory, TransactionSqlService>();
+builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
+
 
 // registers CORS services during service configuration
 //  global CORS settings
@@ -148,6 +155,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler(app =>
+    {
+        app.Run(async context =>
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync("There was error in the srver pleace contact developer");
+        });
+    });
+
 }
 
 
