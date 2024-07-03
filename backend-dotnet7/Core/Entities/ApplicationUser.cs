@@ -18,5 +18,6 @@ namespace backend_dotnet7.Core.Entities
         public ICollection<UserIncome> userIncomes { get; set; } = new List<UserIncome>();
         public ICollection<UserExpense> userExpenses { get; set; } = new List<UserExpense>();
         public ICollection<UserOrganization> userOrganizations { get; set; } = new List<UserOrganization>();
+        public ICollection<DeactivateUserAccount> deactivateUserAccounts { get; set; } = new List<DeactivateUserAccount>();
     }
 }

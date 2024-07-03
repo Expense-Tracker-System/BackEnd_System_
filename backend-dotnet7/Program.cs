@@ -56,6 +56,7 @@ builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmServi
 builder.Services.AddScoped<ITransactionReposatory, TransactionSqlService>();
 builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
 
+
 // registers CORS services during service configuration
 //  global CORS settings
 builder.Services.AddCors(options =>
