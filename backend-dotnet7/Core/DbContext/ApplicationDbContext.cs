@@ -22,8 +22,6 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationIncome> OrganizationIncomes { get; set; }
         public DbSet<OrganizationExpense> OrganizationExpenses { get; set; }
-        public DbSet<OutMessage> OutMessages { get; set; }
-        public DbSet<DeactivateUserAccount> DeactivateUserAccounts { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

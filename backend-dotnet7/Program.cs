@@ -47,8 +47,6 @@ builder.Services.AddScoped<IUserImageService, UserImageService>();
 builder.Services.AddScoped<IUserEmailService, UserEmailService>();
 builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
-builder.Services.AddScoped<IOutMessageService, OutMessageService>();
-builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
 
 // registers CORS services during service configuration
 //  global CORS settings
