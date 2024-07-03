@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using backend_dotnet7.Core.Dtos.Category;
 using AutoMapper;
+using backend_dotnet7.Core.Entities;
 
 namespace backend_dotnet7.Controllers
 {
@@ -16,11 +17,14 @@ namespace backend_dotnet7.Controllers
         public CategoriesController(ICategoryReposatory reposatory)
         {
             _service = reposatory;
+          
             
         }
         [HttpGet]
-        public ActionResult<ICollection<CategoryDto>> GetCategories()
+        public ActionResult<ICollection<CategoryDto>> GetAllCategory(string? title, string? search)
         {
+           
+            var categories = _service.GetAllCategory(title,search);
 
             var CategoriesDto = new List<CategoryDto>();
 
@@ -35,7 +39,7 @@ namespace backend_dotnet7.Controllers
 
             return Ok(CategoriesDto) ;
         }
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name ="GetCategory")]
         public ActionResult<CategoryDto> GetCategory(int id)
         {
             var category = _service.GetCategory(id);
@@ -47,6 +51,23 @@ namespace backend_dotnet7.Controllers
             categoryDto.TitleIcon = $"{category.Title},{category.Icon}";
            
             return Ok(categoryDto);
+        }
+        [HttpPost]
+        public ActionResult<CategoryDto> CreateCategory(CreateCategoryDto category)
+        {
+
+            var cat = new Category();
+            cat.Title = category.Title;
+            cat.Icon = category.Icon;
+
+            var newCat = _service.AddCategory(cat);
+
+            var categoryDto = new CategoryDto();
+            categoryDto.Id = newCat.Id;
+            categoryDto.TitleIcon = $"{newCat.Title},{newCat.Icon}";
+
+            return CreatedAtRoute("GetCategory", new { id = categoryDto.Id },
+                categoryDto);
         }
     }
 }

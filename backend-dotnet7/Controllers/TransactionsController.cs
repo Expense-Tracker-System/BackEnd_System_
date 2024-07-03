@@ -43,7 +43,7 @@ namespace backend_dotnet7.Controllers
             return Ok(transactionsDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name ="GetTransaction")]
         public ActionResult<TransactionDto> GetTransaction(int CategoryId, int id)
         {
             var transaction = _transactionService.GetTransaction(CategoryId,id);
@@ -58,8 +58,51 @@ namespace backend_dotnet7.Controllers
 
             return Ok(transactionDto);
         }
+        [HttpPost]
+        public ActionResult<TransactionDto> createTransaction(int CategoryId,CreateTransactionDto transaction)
+        {
+            var transactionEntity = new Transaction();
+           
+            transactionEntity.Amount = transaction.Amount;
+            transactionEntity.Created = transaction.Created;
+            transactionEntity.Note = transaction.Note;
+            transactionEntity.Status = transaction.Status;
+            
+            var newtransaction = _transactionService.AddTransaction(CategoryId, transactionEntity);
+
+            var transactionDto =  new TransactionDto();
+            transactionDto.Id = newtransaction.Id;
+            transactionDto.Amount = newtransaction.Amount;
+            transactionDto.Created = newtransaction.Created;
+            transactionDto.Note = newtransaction.Note;
+            transactionDto.Status = newtransaction.Status;
+
+
+
+            return CreatedAtRoute("GetTransaction", new {CategoryId = CategoryId, id= transactionDto.Id},
+                transactionDto);
+        }
         //Get Transactions
-       
+        [HttpPut("{transactionId}")]
+       public ActionResult UpdateTransaction(int CategoryId, int transactionId, UpdateTransactionDto transaction)
+        { 
+            var updateTransaction = _transactionService.GetTransaction(CategoryId, transactionId);
+
+            if (updateTransaction != null) 
+            {
+                return NotFound();
+            }
+
+           var updateTransactionDto = new UpdateTransactionDto();
+            updateTransactionDto.Amount = transaction.Amount;
+            updateTransactionDto.Created = transaction.Created;
+            updateTransactionDto.Note = transaction.Note;
+            updateTransactionDto.Status = transaction.Status;
+
+            _transactionService.UpdateTransaction(updateTransaction);
+
+            return NoContent();
+        }
        
 
 

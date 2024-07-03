@@ -23,5 +23,21 @@ namespace backend_dotnet7.Core.Services
         {
             return _context.Transactions.FirstOrDefault(t => t.Id == id && t.CategoryId == CategoryId);
         }
+
+        public Transaction  AddTransaction(int CategoryId, Transaction transaction)
+        {
+            transaction.CategoryId = CategoryId;
+            _context.Transactions.Add(transaction);
+            _context.SaveChanges();
+
+            return _context.Transactions.Find(transaction.Id);
+        }
+
+        public void UpdateTransaction( Transaction transaction) 
+        {
+            _context.SaveChanges();      
+        }
+
+       
     }
 }

@@ -6,5 +6,9 @@ namespace backend_dotnet7.Core.Interfaces
     {
         public List<Transaction> AllTransaction(int CategoryId);
         public Transaction GetTransaction(int CategoryId,int id);
+
+        public Transaction AddTransaction(int CategoryId, Transaction transaction);
+
+        public void UpdateTransaction(Transaction transaction);
     }
 }
