@@ -21,8 +21,6 @@ namespace backend_dotnet7.Controllers
         [HttpGet]
         public ActionResult<ICollection<CategoryDto>> GetCategories()
         {
-            //throw new Exception("Test error");
-            var categories = _service.GetAllCategory();
 
             var CategoriesDto = new List<CategoryDto>();
 
