@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
+using static backend_dotnet7.Core.Entities.UserTransactions;
 
 namespace backend_dotnet7.Core.DbContext
 {
@@ -22,6 +24,11 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationIncome> OrganizationIncomes { get; set; }
         public DbSet<OrganizationExpense> OrganizationExpenses { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+
+
+
+
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -129,7 +136,7 @@ namespace backend_dotnet7.Core.DbContext
 
             builder.Entity<UserOrganization>()
                 .HasOne(uo => uo.organization)
-                .WithMany(o => o.userOrganizations)
+                .WithMany(o => o.UserOrganizations)
                 .HasForeignKey(uo => uo.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -144,7 +151,7 @@ namespace backend_dotnet7.Core.DbContext
             // relationship organization
             builder.Entity<OrganizationIncome>()
                 .HasOne(oi => oi.organization)
-                .WithMany(o => o.organizationIncomes)
+                .WithMany(o => o.OrganizationIncomes)
                 .HasForeignKey(oi => oi.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -155,9 +162,15 @@ namespace backend_dotnet7.Core.DbContext
             // relationship organization
             builder.Entity<OrganizationExpense>()
                 .HasOne(oe => oe.organization)
-                .WithMany(o => o.organizationExpenses)
+                .WithMany(o => o.OrganizationExpenses)
                 .HasForeignKey(oi => oi.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            //report builder
+
+            //organizations
+           // base.OnModelCreating(modelBuilder);
+
         }
     }
 }

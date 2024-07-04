@@ -13,7 +13,7 @@ namespace backend_dotnet7.Core.Entities
         public long? OrganizationId { get; set; }
         // navigate
         public Organization? organization { get; set; }
-
+ 
         public string? Position { get; set; }
         public int shares { get; set; }
         public double TakeAmount { get; set; }
