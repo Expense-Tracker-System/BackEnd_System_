@@ -1,9 +1,13 @@
-﻿using backend_dotnet7.Core.Dtos.Reminder;
+﻿using backend_dotnet7.Core.Dtos.Auth;
+using backend_dotnet7.Core.Dtos.Reminder;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
+using backend_dotnet7.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace backend_dotnet7.Controllers
 {
@@ -40,7 +44,7 @@ namespace backend_dotnet7.Controllers
         [Authorize]
         public async Task<ActionResult<List<Reminder>>> AddReminder(ReminderDto reminder)
         {
-            var result = await _reminderService.AddReminder(reminder , User);
+            var result = await _reminderService.AddReminder(reminder , User );
             return Ok(result);
 
         }

@@ -1,5 +1,7 @@
-﻿using backend_dotnet7.Core.Dtos.Reminder;
+﻿using backend_dotnet7.Core.Dtos.Auth;
+using backend_dotnet7.Core.Dtos.Reminder;
 using backend_dotnet7.Core.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace backend_dotnet7.Core.Interfaces
