@@ -1,3 +1,4 @@
+using backend_dotnet7.Core.BackgroundJobs;
 using backend_dotnet7.Core.DbContext;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -49,6 +51,7 @@ builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
 builder.Services.AddScoped<IOutMessageService, OutMessageService>();
 builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // registers CORS services during service configuration
 //  global CORS settings
@@ -137,7 +140,24 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddQuartz(q =>
+{
+    // Use a Scoped container to create jobs.
+    q.UseMicrosoftDependencyInjectionJobFactory();
 
+    var dailyJobKey = new JobKey("DailyJob");
+
+    // Register the daily job with the DI container
+    q.AddJob<DailyJob>(opts => opts.WithIdentity(dailyJobKey));
+
+    // Create a trigger for the daily job to run every day at 12:00 AM
+    q.AddTrigger(opts => opts
+        .ForJob(dailyJobKey) // Link to the DailyJob
+        .WithIdentity("DailyJob-trigger") // Give the trigger a unique name
+        .WithCronSchedule("0 0 6 * * ?"));
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 
 

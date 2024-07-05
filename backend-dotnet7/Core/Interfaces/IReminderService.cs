@@ -13,5 +13,6 @@ namespace backend_dotnet7.Core.Interfaces
         Task<List<Reminder>> AddReminder(ReminderDto reminder , ClaimsPrincipal User);
         Task<List<Reminder>?> UpdateReminder(int id, ReminderDto request);
         Task<List<Reminder>?> DeleteReminder(int id);
+        Task ReminderMail();
     }
 }
