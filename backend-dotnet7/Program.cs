@@ -52,6 +52,7 @@ builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmServi
 builder.Services.AddScoped<IOutMessageService, OutMessageService>();
 builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAdminsettingService, AdminsettingService>();
 
 // registers CORS services during service configuration
 //  global CORS settings
