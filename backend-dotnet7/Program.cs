@@ -37,6 +37,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //AutoMapper DI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+
 //Dependency Injection
 // .AddSingleton    -> only one Instance for application...
 // .AddScoped       -> Per request -> given new Instance            ->  shared within the same request context
@@ -66,11 +67,14 @@ builder.Services.AddCors(options =>
         });
 });
 
+
+
 //Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
 
 
 //Config Identity
@@ -85,6 +89,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedAccount = false;
 });
+
 
 
 //Add AuthenticationSchema and JwtBearer
