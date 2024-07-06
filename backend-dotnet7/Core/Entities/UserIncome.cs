@@ -8,6 +8,8 @@ namespace backend_dotnet7.Core.Entities
         public string? Description { get; set; }
         public string? Source { get; set; }
         public string? Category { get; set; }
+        
+        public DateTime CreatedDate2 { get; set; } = DateTime.Now;
 
         [ForeignKey(nameof(ApplicationUser))]
         public string? UserId { get; set; }

@@ -2,7 +2,9 @@ using backend_dotnet7.Core.DbContext;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using backend_dotnet7.Core.Services;
+//using backend_dotnet7.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,18 +14,36 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+using AutoMapper;
+using backend_dotnet7.Core.Dtos.Organization;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services
     .AddControllers()
-    // Enum Configuration
+    // Enum Configuration 
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+
+//auto map add organizations
+
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.CreateMap<Organization, OrganizationDto>();
+});
+
+IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+//services.AddAutoMapper(typeof(Startup));
+//builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 
 
@@ -58,6 +78,11 @@ builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOutMessageService, OutMessageService>();
 builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
+builder.Services.AddScoped<ICreateOrganizationService, CreateOrganizationService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+//atto mapper configaration
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<IFinancialService, FinancialService>();
 
 
 // registers CORS services during service configuration
@@ -156,6 +181,9 @@ builder.Services.AddSwaggerGen(options =>
 
 
 var app = builder.Build();
+
+//cros origin foe reports
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

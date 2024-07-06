@@ -75,7 +75,7 @@ namespace backend_dotnet7.Controllers
         // Route -> List of all Users with details
         [HttpGet]
         [Route("users")]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<UserInfoResult>>> GetUsersList()
         {
             var usersList = await _authService.GetUsersListAsync();
