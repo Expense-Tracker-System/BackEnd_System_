@@ -16,3 +16,4 @@ namespace backend_dotnet7.Core.Dtos.Budget
 
     }
 }
+

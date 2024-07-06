@@ -1,6 +1,7 @@
 ﻿using backend_dotnet7.Core.Dtos.Budget;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,15 +18,15 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<getbudgetDto>>> GetAllBudgets(string username)
+        public async Task<ActionResult<List<getbudgetDto>>> GetAllBudgets()
         {
-            var result = await _budgetService.GetAllBudgets(username);
+            var result = await _budgetService.GetAllBudgets(User);
 
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Budget>> GetSingleBudget(int id)
+        [HttpGet("getsinglebudget")]
+        public async Task<ActionResult<getbudgetDto>> GetSingleBudget(int id)
         {
             var result = await _budgetService.GetSingleBudget(id);
             if (result is null)
@@ -34,6 +35,7 @@ namespace backend_dotnet7.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<List<Budget>>> AddBudget(BudgetDto budget)
         {
             var result = await _budgetService.AddBudget(budget, User);

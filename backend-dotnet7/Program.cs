@@ -5,6 +5,7 @@ using backend_dotnet7.Core.Services;
 //using backend_dotnet7.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -26,9 +27,10 @@ builder.Services
     .AddControllers()
     // Enum Configuration 
     .AddJsonOptions(options =>
-     {
-         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-     });
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 
 //auto map add organizations
 
@@ -52,6 +54,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+//AutoMapper DI
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
 
 //Dependency Injection
 // .AddSingleton    -> only one Instance for application...
@@ -67,15 +73,16 @@ builder.Services.AddScoped<IUserImageService, UserImageService>();
 builder.Services.AddScoped<IUserEmailService, UserEmailService>();
 builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
+builder.Services.AddScoped<ITransactionReposatory, TransactionSqlService>();
+builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOutMessageService, OutMessageService>();
+builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
 builder.Services.AddScoped<ICreateOrganizationService, CreateOrganizationService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 //atto mapper configaration
 builder.Services.AddAutoMapper(typeof(Program));
-
-
 builder.Services.AddScoped<IFinancialService, FinancialService>();
-
-//cros origin for report
 
 
 // registers CORS services during service configuration
@@ -89,11 +96,14 @@ builder.Services.AddCors(options =>
         });
 });
 
+
+
 //Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
 
 
 //Config Identity
@@ -108,6 +118,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedAccount = false;
 });
+
 
 
 //Add AuthenticationSchema and JwtBearer
@@ -179,6 +190,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler(app =>
+    {
+        app.Run(async context =>
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync("There was error in the srver pleace contact developer");
+        });
+    });
+
 }
 
 
