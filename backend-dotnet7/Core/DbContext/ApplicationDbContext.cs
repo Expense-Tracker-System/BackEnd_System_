@@ -30,6 +30,7 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Category> categories { get; set; }
         public DbSet<OutMessage> OutMessages { get; set; }
         public DbSet<DeactivateUserAccount> DeactivateUserAccounts { get; set; }
+        public DbSet<Report> Reports { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -225,6 +226,17 @@ namespace backend_dotnet7.Core.DbContext
                 .HasOne(deuacc => deuacc.applicationUser)
                 .WithMany(u => u.deactivateUserAccounts)
                 .HasForeignKey(deuacc => deuacc.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<Report>()
+                .HasKey(report => report.ReportId);
+
+            // relationship report
+            builder.Entity<Report>()
+                .HasOne(re => re.applicationUser)
+                .WithMany(u => u.reports)
+                .HasForeignKey(re => re.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
             
