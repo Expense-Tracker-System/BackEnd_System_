@@ -183,7 +183,7 @@ namespace backend_dotnet7.Core.DbContext
             // relationship user organization -> organization
             builder.Entity<UserOrganization>()
                 .HasOne(uo => uo.organization)
-                .WithMany(o => o.userOrganizations)
+                .WithMany(o => o.UserOrganizations)
                 .HasForeignKey(uo => uo.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -198,7 +198,7 @@ namespace backend_dotnet7.Core.DbContext
             // relationship organization
             builder.Entity<OrganizationIncome>()
                 .HasOne(oi => oi.organization)
-                .WithMany(o => o.organizationIncomes)
+                .WithMany(o => o.OrganizationIncomes)
                 .HasForeignKey(oi => oi.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -209,7 +209,7 @@ namespace backend_dotnet7.Core.DbContext
             // relationship organization
             builder.Entity<OrganizationExpense>()
                 .HasOne(oe => oe.organization)
-                .WithMany(o => o.organizationExpenses)
+                .WithMany(o => o.OrganizationExpenses)
                 .HasForeignKey(oe => oe.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
