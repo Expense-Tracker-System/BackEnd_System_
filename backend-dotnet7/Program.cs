@@ -38,6 +38,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
+
 //Dependency Injection
 // .AddSingleton    -> only one Instance for application...
 // .AddScoped       -> Per request -> given new Instance            ->  shared within the same request context
@@ -54,6 +55,9 @@ builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
 builder.Services.AddScoped<ITransactionReposatory, TransactionSqlService>();
 builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOutMessageService, OutMessageService>();
+builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
 
 
 // registers CORS services during service configuration
