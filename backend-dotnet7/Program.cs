@@ -155,7 +155,7 @@ builder.Services.AddQuartz(q =>
     q.AddTrigger(opts => opts
         .ForJob(dailyJobKey) // Link to the DailyJob
         .WithIdentity("DailyJob-trigger") // Give the trigger a unique name
-        .WithCronSchedule("0 0 6 * * ?"));
+        .WithCronSchedule("0 50 16 * * ?"));
 });
 
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

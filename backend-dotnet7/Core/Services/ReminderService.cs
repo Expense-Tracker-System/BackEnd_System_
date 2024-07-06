@@ -39,7 +39,7 @@ namespace backend_dotnet7.Core.Services
             try
             {
                 var email = await dbContext.Users.Where(u => u.Id == newrem.UserId).Select(u => u.Email).FirstOrDefaultAsync();
-                var text = new EmailTemplate();
+              var text = new EmailTemplate();
                 var htmltext = text.reminderset(newrem.ReminderName, newrem.ReminderstartDate, newrem.ReminderAmount, newrem.ReminderDescription);
                 await _emailService.SendEmail(htmltext, email, "Reminder set");
             }
