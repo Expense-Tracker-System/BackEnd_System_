@@ -7,6 +7,10 @@ namespace backend_dotnet7.Core.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> //generic type
     {
+        public ApplicationDbContext()
+        {
+        }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
@@ -22,6 +26,8 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationIncome> OrganizationIncomes { get; set; }
         public DbSet<OrganizationExpense> OrganizationExpenses { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Category> categories { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -69,6 +75,51 @@ namespace backend_dotnet7.Core.DbContext
             builder.Entity<IdentityUserRole<string>>(e =>
             {
                e.ToTable("UserRoles");
+            });
+
+            builder.Entity<Transaction>().HasData(new Transaction[] {
+               new Transaction
+               {
+                    Id = 4,
+                    Amount = 800,
+                    Note = "Ileccity Bill",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId = 1,
+               },
+               new Transaction
+               {
+
+                    Id = 1,
+                    Amount = 200,
+                    Note = "Elecity Bill",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId = 2,
+               },
+               new Transaction{
+                    Id = 2,
+                    Amount = 500,
+                    Note = "water Bill",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId= 3,
+               },
+               new Transaction{
+                    Id = 3,
+                    Amount = 1000,
+                    Note = "Medicine",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId= 4,
+               }
+            });
+
+            builder.Entity<Category>().HasData(new Category[] { 
+                new Category{ Id = 1,Title="Eleccity Bill", Icon="💡"},
+                new Category{ Id = 2,Title="Water bill", Icon="🚰" },
+                new Category{ Id = 3,Title="Travel", Icon="✈️" },
+                new Category{ Id = 4,Title="Medicine", Icon="💊" }
             });
 
             // primary key
@@ -174,5 +225,6 @@ namespace backend_dotnet7.Core.DbContext
                 .HasForeignKey(deuacc => deuacc.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+            
     }
 }

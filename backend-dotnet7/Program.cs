@@ -34,6 +34,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+//AutoMapper DI
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 //Dependency Injection
@@ -50,7 +52,8 @@ builder.Services.AddScoped<IUserImageService, UserImageService>();
 builder.Services.AddScoped<IUserEmailService, UserEmailService>();
 builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
-
+builder.Services.AddScoped<ITransactionReposatory, TransactionSqlService>();
+builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
 
 
 // registers CORS services during service configuration

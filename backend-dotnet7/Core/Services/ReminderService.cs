@@ -1,21 +1,29 @@
 ﻿using backend_dotnet7.Core.DbContext;
+using backend_dotnet7.Core.Dtos.Auth;
 using backend_dotnet7.Core.Dtos.Log;
 using backend_dotnet7.Core.Dtos.Reminder;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
+using backend_dotnet7.Core.Template;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+
 
 namespace backend_dotnet7.Core.Services
 {
     public class ReminderService : IReminderService
     {
         protected readonly ApplicationDbContext dbContext;
-        public ReminderService(ApplicationDbContext context)
+        private readonly IEmailService _emailService;
+
+        public ReminderService(ApplicationDbContext context , IEmailService emailService)
         {
             dbContext = context;
+            _emailService = emailService;
         }
-        public async Task<List<Reminder>> AddReminder(ReminderDto reminder , ClaimsPrincipal user)
+        public async Task<List<Reminder>> AddReminder(ReminderDto reminder , ClaimsPrincipal user )
         {
             var newrem = new Reminder
             {
@@ -28,7 +36,20 @@ namespace backend_dotnet7.Core.Services
             };
             dbContext.Reminders.Add(newrem);
             await dbContext.SaveChangesAsync();
+            try
+            {
+                var email = await dbContext.Users.Where(u => u.Id == newrem.UserId).Select(u => u.Email).FirstOrDefaultAsync();
+                var text = new EmailTemplate();
+                var htmltext = text.reminderset(newrem.ReminderName, newrem.ReminderstartDate, newrem.ReminderAmount, newrem.ReminderDescription);
+                await _emailService.SendEmail(htmltext, email, "Reminder set");
+            }
+            catch
+            {
+
+            }
+
             return await dbContext.Reminders.ToListAsync();
+
         }
 
         public async Task<List<Reminder>?> DeleteReminder(int id)
