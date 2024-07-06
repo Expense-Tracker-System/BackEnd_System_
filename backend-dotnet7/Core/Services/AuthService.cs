@@ -6,6 +6,7 @@ using backend_dotnet7.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -142,7 +143,6 @@ namespace backend_dotnet7.Core.Services
                 Email = registerDto.Email,
                 UserName = registerDto.Username,
                 PhoneNumber = registerDto.PhoneNumber,
-                Roles = "User",
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
@@ -197,7 +197,13 @@ namespace backend_dotnet7.Core.Services
 
             //Return Token and userInfo to front-end
             var NewToken = await GenerateJWTTokenAsync(user);
-            var userInfo = GenerateUserInfoObject(user);
+
+            // find user role
+            var roles = await _userManager.GetRolesAsync(user);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = GenerateUserInfoObject(user, roles);
             await _logService.SaveNewLog(user.UserName, "New Login");
 
             return new LoginServiceResponseDto()
@@ -229,7 +235,13 @@ namespace backend_dotnet7.Core.Services
                 return null;
 
             var NewToken = await GenerateJWTTokenAsync(user);
-            var userInfo = GenerateUserInfoObject(user);
+
+            // find user role
+            var roles = await _userManager.GetRolesAsync(user);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = GenerateUserInfoObject(user, roles);
             await _logService.SaveNewLog(user.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto()
@@ -249,7 +261,12 @@ namespace backend_dotnet7.Core.Services
 
             foreach(var user in users)
             {
-                var userInfo = GenerateUserInfoObject(user);
+                // find user role
+                var roles = await _userManager.GetRolesAsync(user);
+
+                //var rolesList = roles.ToList();
+
+                var userInfo = GenerateUserInfoObject(user, roles);
                 userInfoResults.Add(userInfo);
             }
 
@@ -262,7 +279,12 @@ namespace backend_dotnet7.Core.Services
             if (user is null)
                 return null;
 
-            var userInfo = GenerateUserInfoObject(user);
+            // find user role
+            var roles = await _userManager.GetRolesAsync(user);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = GenerateUserInfoObject(user, roles);
 
             return userInfo;
         }
@@ -297,7 +319,13 @@ namespace backend_dotnet7.Core.Services
 
             // generate new JWT token...
             var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser);
+
+            // find user role
+            var roles = await _userManager.GetRolesAsync(isExistsUser);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = GenerateUserInfoObject(isExistsUser, roles);
             await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto
@@ -334,7 +362,13 @@ namespace backend_dotnet7.Core.Services
 
             // generate new JWT token...
             var newToken = await GenerateJWTTokenAsync(isExistsUser);
-            var userInfo = GenerateUserInfoObject(isExistsUser);
+
+            // find user role
+            var roles = await _userManager.GetRolesAsync(isExistsUser);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = GenerateUserInfoObject(isExistsUser, roles);
             await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto
@@ -391,7 +425,7 @@ namespace backend_dotnet7.Core.Services
 
 
         //GenerateUserInfoObject
-        private UserInfoResult GenerateUserInfoObject(ApplicationUser user)
+        private UserInfoResult GenerateUserInfoObject(ApplicationUser user, IEnumerable<string> roles)
         {
             return new UserInfoResult()
             {
@@ -402,7 +436,7 @@ namespace backend_dotnet7.Core.Services
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 CreatedAt = user.CreatedAt,
-                Roles = user.Roles
+                Roles = roles
             };
         }
     }

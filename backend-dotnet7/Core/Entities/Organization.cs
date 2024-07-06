@@ -13,10 +13,10 @@ namespace backend_dotnet7.Core.Entities
         public double TotalTakeAmount { get; set; }
         public double TotalGetAmount { get; set; }
         public string? LeaderUsername { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
+        //public DateTime CreatedAt { get; set; }
+        //public DateTime UpdatedAt { get; set; }
+        //public bool IsActive { get; set; }
+        //public bool IsDeleted { get; set; }
 
         public ICollection<UserOrganization> UserOrganizations { get; set; } = new List<UserOrganization>();
         public ICollection<OrganizationIncome> OrganizationIncomes { get; set; } = new List<OrganizationIncome>();
