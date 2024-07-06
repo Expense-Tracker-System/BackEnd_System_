@@ -1,4 +1,4 @@
-﻿using backend_dotnet7.Core.Entities;
+using backend_dotnet7.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +7,10 @@ namespace backend_dotnet7.Core.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> //generic type
     {
+        public ApplicationDbContext()
+        {
+        }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
@@ -22,8 +26,11 @@ namespace backend_dotnet7.Core.DbContext
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationIncome> OrganizationIncomes { get; set; }
         public DbSet<OrganizationExpense> OrganizationExpenses { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Category> categories { get; set; }
         public DbSet<OutMessage> OutMessages { get; set; }
         public DbSet<DeactivateUserAccount> DeactivateUserAccounts { get; set; }
+        public DbSet<Report> Reports { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -71,6 +78,51 @@ namespace backend_dotnet7.Core.DbContext
             builder.Entity<IdentityUserRole<string>>(e =>
             {
                e.ToTable("UserRoles");
+            });
+
+            builder.Entity<Transaction>().HasData(new Transaction[] {
+               new Transaction
+               {
+                    Id = 4,
+                    Amount = 800,
+                    Note = "Ileccity Bill",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId = 1,
+               },
+               new Transaction
+               {
+
+                    Id = 1,
+                    Amount = 200,
+                    Note = "Elecity Bill",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId = 2,
+               },
+               new Transaction{
+                    Id = 2,
+                    Amount = 500,
+                    Note = "water Bill",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId= 3,
+               },
+               new Transaction{
+                    Id = 3,
+                    Amount = 1000,
+                    Note = "Medicine",
+                    Created = DateTime.Now,
+                    Status = TransactionStatus.Completed,
+                    CategoryId= 4,
+               }
+            });
+
+            builder.Entity<Category>().HasData(new Category[] { 
+                new Category{ Id = 1,Title="Eleccity Bill", Icon="💡"},
+                new Category{ Id = 2,Title="Water bill", Icon="🚰" },
+                new Category{ Id = 3,Title="Travel", Icon="✈️" },
+                new Category{ Id = 4,Title="Medicine", Icon="💊" }
             });
 
             // primary key
@@ -131,7 +183,7 @@ namespace backend_dotnet7.Core.DbContext
             // relationship user organization -> organization
             builder.Entity<UserOrganization>()
                 .HasOne(uo => uo.organization)
-                .WithMany(o => o.userOrganizations)
+                .WithMany(o => o.UserOrganizations)
                 .HasForeignKey(uo => uo.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -146,7 +198,7 @@ namespace backend_dotnet7.Core.DbContext
             // relationship organization
             builder.Entity<OrganizationIncome>()
                 .HasOne(oi => oi.organization)
-                .WithMany(o => o.organizationIncomes)
+                .WithMany(o => o.OrganizationIncomes)
                 .HasForeignKey(oi => oi.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -157,7 +209,7 @@ namespace backend_dotnet7.Core.DbContext
             // relationship organization
             builder.Entity<OrganizationExpense>()
                 .HasOne(oe => oe.organization)
-                .WithMany(o => o.organizationExpenses)
+                .WithMany(o => o.OrganizationExpenses)
                 .HasForeignKey(oe => oe.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -175,6 +227,18 @@ namespace backend_dotnet7.Core.DbContext
                 .WithMany(u => u.deactivateUserAccounts)
                 .HasForeignKey(deuacc => deuacc.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // primary key
+            builder.Entity<Report>()
+                .HasKey(report => report.ReportId);
+
+            // relationship report
+            builder.Entity<Report>()
+                .HasOne(re => re.applicationUser)
+                .WithMany(u => u.reports)
+                .HasForeignKey(re => re.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
+            
     }
 }

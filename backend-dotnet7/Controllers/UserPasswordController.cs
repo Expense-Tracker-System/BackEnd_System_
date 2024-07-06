@@ -9,6 +9,8 @@ using System.Security.Claims;
 
 namespace backend_dotnet7.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class UserPasswordController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
