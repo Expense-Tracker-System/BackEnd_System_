@@ -18,12 +18,12 @@ namespace backend_dotnet7.Core.Services
         protected readonly ApplicationDbContext dbContext;
         private readonly IEmailService _emailService;
 
-        public ReminderService(ApplicationDbContext context , IEmailService emailService)
+        public ReminderService(ApplicationDbContext context, IEmailService emailService)
         {
             dbContext = context;
             _emailService = emailService;
         }
-        public async Task<List<Reminder>> AddReminder(ReminderDto reminder , ClaimsPrincipal user )
+        public async Task<List<Reminder>> AddReminder(ReminderDto reminder, ClaimsPrincipal user)
         {
             var newrem = new Reminder
             {
@@ -39,7 +39,7 @@ namespace backend_dotnet7.Core.Services
             try
             {
                 var email = await dbContext.Users.Where(u => u.Id == newrem.UserId).Select(u => u.Email).FirstOrDefaultAsync();
-                var text = new EmailTemplate();
+              var text = new EmailTemplate();
                 var htmltext = text.reminderset(newrem.ReminderName, newrem.ReminderstartDate, newrem.ReminderAmount, newrem.ReminderDescription);
                 await _emailService.SendEmail(htmltext, email, "Reminder set");
             }
@@ -106,5 +106,27 @@ namespace backend_dotnet7.Core.Services
 
             return await dbContext.Reminders.ToListAsync();
         }
+        public async Task ReminderMail()
+        {
+            var reminders = await dbContext.Reminders.ToListAsync();
+            foreach (var item in reminders)
+            {
+                if(DateOnly.FromDateTime(item.ReminderstartDate) == DateOnly.FromDateTime(DateTime.Today))
+                {
+                    try
+                    {
+                        var email = await dbContext.Users.Where(u => u.Id == item.UserId).Select(u => u.Email).FirstOrDefaultAsync();
+                        var text = new EmailTemplate();
+                        var htmltext = text.remindertoday(item.ReminderName, item.ReminderAmount, item.ReminderDescription);
+                        await _emailService.SendEmail(htmltext, email, "Reminder Today");
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+        }
     }
-}
+}  
+    
