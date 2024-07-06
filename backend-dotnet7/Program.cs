@@ -17,9 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services
-    .AddControllers(options => {
-        options.ReturnHttpNotAcceptable = true;
-    }).AddXmlDataContractSerializerFormatters()
+    .AddControllers();
     // Enum Configuration
     .AddJsonOptions(options =>
     {
