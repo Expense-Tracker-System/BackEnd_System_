@@ -3,6 +3,7 @@ using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using backend_dotnet7.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -19,9 +20,10 @@ builder.Services
     .AddControllers()
     // Enum Configuration
     .AddJsonOptions(options =>
-     {
-         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-     });
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 
 
 
@@ -31,6 +33,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("default");
     options.UseSqlServer(connectionString);
 });
+
 
 
 //Dependency Injection
@@ -48,6 +51,8 @@ builder.Services.AddScoped<IUserEmailService, UserEmailService>();
 builder.Services.AddScoped<IBExpenseService, BExpenseService>();
 builder.Services.AddScoped<IUserPasswordConfirmService, UserPasswordConfirmService>();
 
+
+
 // registers CORS services during service configuration
 //  global CORS settings
 builder.Services.AddCors(options =>
@@ -59,11 +64,14 @@ builder.Services.AddCors(options =>
         });
 });
 
+
+
 //Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
 
 
 //Config Identity
@@ -78,6 +86,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedAccount = false;
 });
+
 
 
 //Add AuthenticationSchema and JwtBearer
@@ -146,6 +155,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler(app =>
+    {
+        app.Run(async context =>
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync("There was error in the srver pleace contact developer");
+        });
+    });
+
 }
 
 
