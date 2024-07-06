@@ -195,23 +195,38 @@ namespace backend_dotnet7.Core.Services
                 return null;
             }
 
-            //Return Token and userInfo to front-end
-            var NewToken = await GenerateJWTTokenAsync(user);
-
             // find user role
             var roles = await _userManager.GetRolesAsync(user);
 
-            //var rolesList = roles.ToList();
-
-            var userInfo = GenerateUserInfoObject(user, roles);
-            await _logService.SaveNewLog(user.UserName, "New Login");
-
-            return new LoginServiceResponseDto()
+            // check pathname
+            bool containsRole = false;
+            foreach (var role in roles)
             {
-                NewToken = NewToken,
-                userInfo = userInfo
-            };
+                if (loginDto.pathName.Contains(role.ToLower(), StringComparison.OrdinalIgnoreCase))
+                {
+                    containsRole = true;
+                    break;
+                }
+            }
 
+            if(containsRole)
+            {
+                //Return Token and userInfo to front-end
+                var NewToken = await GenerateJWTTokenAsync(user);
+
+                //var rolesList = roles.ToList();
+
+                var userInfo = GenerateUserInfoObject(user, roles);
+                await _logService.SaveNewLog(user.UserName, "New Login");
+
+                return new LoginServiceResponseDto()
+                {
+                    NewToken = NewToken,
+                    userInfo = userInfo
+                };
+            }
+
+            return null;
 
         }
 

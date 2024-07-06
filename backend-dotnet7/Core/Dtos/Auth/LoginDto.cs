@@ -9,5 +9,8 @@ namespace backend_dotnet7.Core.Dtos.Auth
 
         [Required(ErrorMessage = "Password is Required")] //validation part in backend
         public string? Password { get; set; }
+        
+        [Required(ErrorMessage = "PathName is required")] // validate pathname
+        public string? pathName { get; set; }
     }
 }
