@@ -25,7 +25,7 @@ namespace backend_dotnet7.Controllers
         [HttpPut]
         [Route("updateUserPassword")]
         [Authorize]
-        public async Task<ActionResult<GeneralServiceResponseDto>> updateUserPassword([FromBody] UpdateUserPasswordDto updateUserPasswordDto)
+        public async Task<ActionResult<GeneralServiceResponseDto>> updateUserPasswordAsync([FromBody] UpdateUserPasswordDto updateUserPasswordDto)
         {
             try
             {

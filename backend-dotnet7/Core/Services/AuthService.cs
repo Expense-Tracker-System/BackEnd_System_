@@ -22,6 +22,7 @@ namespace backend_dotnet7.Core.Services
         private readonly IUserPasswordConfirmService _userPasswordConfirmService;
         private readonly IUserEmailService _userEmailService;
         private readonly IUserPhoneNumberService _userPhoneNumberService;
+        private readonly IGenerateResponseService _generateResponseService;
 
         public AuthService(UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole> roleManager,
@@ -29,7 +30,8 @@ namespace backend_dotnet7.Core.Services
             IConfiguration configuration, 
             IUserPasswordConfirmService userPasswordConfirmService,
             IUserEmailService userEmailService,
-            IUserPhoneNumberService userPhoneNumberService)
+            IUserPhoneNumberService userPhoneNumberService,
+            IGenerateResponseService generateResponseService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -38,6 +40,7 @@ namespace backend_dotnet7.Core.Services
             _userPasswordConfirmService = userPasswordConfirmService;
             _userEmailService = userEmailService;
             _userPhoneNumberService = userPhoneNumberService;
+            _generateResponseService = generateResponseService;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -212,11 +215,11 @@ namespace backend_dotnet7.Core.Services
             if(containsRole)
             {
                 //Return Token and userInfo to front-end
-                var NewToken = await GenerateJWTTokenAsync(user);
+                var NewToken = await _generateResponseService.GenerateJwtTokenAsync(user);
 
                 //var rolesList = roles.ToList();
 
-                var userInfo = GenerateUserInfoObject(user, roles);
+                var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
                 await _logService.SaveNewLog(user.UserName, "New Login");
 
                 return new LoginServiceResponseDto()
@@ -249,14 +252,14 @@ namespace backend_dotnet7.Core.Services
             if (user is null)
                 return null;
 
-            var NewToken = await GenerateJWTTokenAsync(user);
+            var NewToken = await _generateResponseService.GenerateJwtTokenAsync(user);
 
             // find user role
             var roles = await _userManager.GetRolesAsync(user);
 
             //var rolesList = roles.ToList();
 
-            var userInfo = GenerateUserInfoObject(user, roles);
+            var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
             await _logService.SaveNewLog(user.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto()
@@ -281,7 +284,7 @@ namespace backend_dotnet7.Core.Services
 
                 //var rolesList = roles.ToList();
 
-                var userInfo = GenerateUserInfoObject(user, roles);
+                var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
                 userInfoResults.Add(userInfo);
             }
 
@@ -299,7 +302,7 @@ namespace backend_dotnet7.Core.Services
 
             //var rolesList = roles.ToList();
 
-            var userInfo = GenerateUserInfoObject(user, roles);
+            var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
 
             return userInfo;
         }
@@ -333,14 +336,14 @@ namespace backend_dotnet7.Core.Services
             }
 
             // generate new JWT token...
-            var newToken = await GenerateJWTTokenAsync(isExistsUser);
+            var newToken = await _generateResponseService.GenerateJwtTokenAsync(isExistsUser);
 
             // find user role
             var roles = await _userManager.GetRolesAsync(isExistsUser);
 
             //var rolesList = roles.ToList();
 
-            var userInfo = GenerateUserInfoObject(isExistsUser, roles);
+            var userInfo = _generateResponseService.GenerateUserInfoAsync(isExistsUser, roles);
             await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto
@@ -350,109 +353,5 @@ namespace backend_dotnet7.Core.Services
             };
         }
 
-        public async Task<LoginServiceResponseDto?> UpdateUserName(UpdateUserNameDto updateUserNameDto)
-        {
-            var isExistsUser = await _userManager.FindByNameAsync(updateUserNameDto.UserName);
-
-            if (isExistsUser is null)
-            {
-                return null;
-            }
-
-            // userName is unique...
-            var userNameList = await GetUsernameListAsync();
-            if (userNameList.Contains(updateUserNameDto.NewUserName))
-            {
-                return null;
-            }
-
-            isExistsUser.UserName = updateUserNameDto.NewUserName;
-
-            var updateResult = await _userManager.UpdateAsync(isExistsUser);
-
-            if (!updateResult.Succeeded)
-            {
-                return null;
-            }
-
-            // generate new JWT token...
-            var newToken = await GenerateJWTTokenAsync(isExistsUser);
-
-            // find user role
-            var roles = await _userManager.GetRolesAsync(isExistsUser);
-
-            //var rolesList = roles.ToList();
-
-            var userInfo = GenerateUserInfoObject(isExistsUser, roles);
-            await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
-
-            return new LoginServiceResponseDto
-            {
-                NewToken = newToken,
-                userInfo = userInfo
-            };
-        }
-
-
-
-
-        //GenerateJWTTokenAsync
-        private async Task<string> GenerateJWTTokenAsync(ApplicationUser user)
-        {
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier,user.Id),
-                new Claim("FirstName",user.FirstName),
-                new Claim("LastName",user.LastName)
-            };
-
-            foreach(var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            }
-
-            //Created Our Own Secret
-            var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-            //Create Credential
-            var signingCredentials = new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256);
-
-            //Create new Token
-            var tokenObject = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                notBefore: DateTime.Now,
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: signingCredentials
-                );
-
-
-            string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
-            return token;
-
-        }
-
-
-
-
-        //GenerateUserInfoObject
-        private UserInfoResult GenerateUserInfoObject(ApplicationUser user, IEnumerable<string> roles)
-        {
-            return new UserInfoResult()
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                CreatedAt = user.CreatedAt,
-                Roles = roles
-            };
-        }
     }
 }

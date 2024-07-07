@@ -14,6 +14,5 @@ namespace backend_dotnet7.Core.Interfaces
         Task<UserInfoResult?> GetUserDetailsByUserNameAsync(string userName);
         Task<IEnumerable<string>> GetUsernameListAsync();
         Task<LoginServiceResponseDto?> UpdateFirstLastName(UpdateFirstLastNameDto updateFirstLastNameDto);
-        Task<LoginServiceResponseDto?> UpdateUserName(UpdateUserNameDto updateUserNameDto);
     }
 }

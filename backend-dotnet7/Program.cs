@@ -80,9 +80,13 @@ builder.Services.AddScoped<IOutMessageService, OutMessageService>();
 builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
 builder.Services.AddScoped<ICreateOrganizationService, CreateOrganizationService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
-//atto mapper configaration
+
+//auto mapper configaration
 builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddScoped<IFinancialService, FinancialService>();
+builder.Services.AddScoped<IUserUserNameService, UserUserNameService>();
+builder.Services.AddScoped<IGenerateResponseService, GenerateResponseService>();
 
 
 // registers CORS services during service configuration
