@@ -19,14 +19,14 @@ namespace backend_dotnet7.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<TransactionDto> AddTransaction(TransactionDto transaction)
+        public async Task<TransactionDto> AddTransaction(string userName, TransactionDto transaction)
         {
             var entity = new TransactionEntity
             {
                 Id = transaction.Id,
                 Amount = transaction.Amount,
                 Description = transaction.Description,
-                userName = transaction.userName, // Assign the UserName from DTO
+                userName = userName,
             };
 
             _context.TransactionEntities.Add(entity);
@@ -35,20 +35,9 @@ namespace backend_dotnet7.Infrastructure.Services
             return transaction;
         }
 
-        public Task<bool> DeleteTransaction(int id, string userName)
-        {
-            throw new NotImplementedException();
-        }
-
-        //public IEnumerable<TransactionDto> GetTransactions(string userName)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        public Task<TransactionDto> UpdateTransaction(int id, TransactionDto transaction, string userName)
-        {
-            throw new NotImplementedException();
-        }
+       
+       
+        
 
         
         public IEnumerable<TransactionDto> GetTransactions(string userName)
@@ -59,45 +48,42 @@ namespace backend_dotnet7.Infrastructure.Services
                     Amount = t.Amount,
                     Description = t.Description,
                      // Assuming CreatedAt as Date
-                    userName = userName
                 })
                 .ToList();
 
             return transactions;
         }
-        /*
+        
         public async Task<bool> DeleteTransaction(int id, string userName)
         {
-            var transaction = await _context.TransactionEntities
-                .FirstOrDefaultAsync(t => t.Id == id && t.userName == userName);
-
-            if (transaction == null)
-                return false;
-
-            _context.TransactionEntities.Remove(transaction);
+            var entity = new TransactionEntity
+            {
+                Id = id,
+              
+                userName =userName, // Assign the UserName from DTO
+            };
+            _context.TransactionEntities.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<TransactionDto> UpdateTransaction(int id, TransactionDto transactionDto, string userName)
+        public async Task<TransactionEntity> UpdateTransaction( TransactionDto transaction, string userName)
         {
-            var existingTransaction = await _context.TransactionEntities
-                .FirstOrDefaultAsync(t => t.Id == id && t.userName == userName);
+            var existingTransaction = await _context.
+                TransactionEntities.FirstOrDefaultAsync(t => t.Id == transaction.Id && t.userName == userName);
 
             if (existingTransaction == null)
                 return null;
 
-            existingTransaction.Amount = transactionDto.Amount;
-            existingTransaction.Description = transactionDto.Description;
-            existingTransaction.CreatedAt = transactionDto.Date;
+            existingTransaction.Amount = transaction.Amount;
+            existingTransaction.Description = transaction.Description;
 
             _context.TransactionEntities.Update(existingTransaction);
             await _context.SaveChangesAsync();
 
-            return transactionDto;
+            return existingTransaction;
         }
-        */
 
-
+       
     }
 }

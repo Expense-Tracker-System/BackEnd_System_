@@ -19,37 +19,19 @@ namespace backend_dotnet7.Controllers
             _transactionService = transactionService;
         }
 
-        [HttpPost("AddTransaction")]
+        [HttpPost]
+        [Route("AddTransaction")]
 
-        public async Task<IActionResult> AddTransaction([FromBody] GetTransactionDto getTransactionDto)
+        public async Task<IActionResult> AddTransaction([FromBody] TransactionDto transactionDto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var transactionDto = new TransactionDto
-                {
-                    Id = getTransactionDto.Id,
-                    Amount = getTransactionDto.Amount,
-                    Description = getTransactionDto.Description,
-                    userName = User.Identity.Name
-                };
-
-                var result = await _transactionService.AddTransaction(transactionDto);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                return StatusCode(500, "Internal server error");
-            }
+            var userName = User.Identity.Name;
+            var transactions = await _transactionService.AddTransaction(userName, transactionDto);
+            return Ok(transactions);
         }
 
        
-        [HttpGet("GetTransactions")]
+        [HttpGet]
+        [Route("GetTransactions")]
 
         public async Task<IActionResult> GetTransactions()
         {
@@ -60,7 +42,8 @@ namespace backend_dotnet7.Controllers
         }
 
        
-        [HttpDelete("DeleteTransaction")]
+        [HttpDelete]
+        [Route("DeleteTransaction/{id}")]
 
         public async Task<IActionResult> DeleteTransaction(int id)
         {
@@ -83,32 +66,21 @@ namespace backend_dotnet7.Controllers
         }
 
         
-        [HttpPut("UpdateTransaction")]
+        [HttpPut]
+        [Route("UpdateTransaction")]
 
-        public async Task<IActionResult> UpdateTransaction(int id, [FromBody] TransactionDto transaction)
+        public async Task<IActionResult> UpdateTransaction( [FromBody] TransactionDto transaction)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            
 
                 var userName = User.Identity.Name;
 
-                var updatedTransaction = await _transactionService.UpdateTransaction(id, transaction, userName);
-                if (updatedTransaction == null)
-                {
-                    return NotFound();
-                }
+                var updatedTransaction = await _transactionService.UpdateTransaction( transaction, userName);
+                
 
                 return Ok(updatedTransaction);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                return StatusCode(500, "Internal server error");
-            }
+           
         }
+        
     }
 }
