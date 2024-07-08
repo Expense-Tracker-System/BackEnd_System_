@@ -4,5 +4,6 @@
     {
         Task<bool> PhoneNumberValidation(string phoneNumber);
         Task<bool> IsPhoneNumberUnique(string phoneNumber);
+        Task<bool> IsPhoneNumberUniqueForUpdate(string phoneNumber, string userId);
     }
 }

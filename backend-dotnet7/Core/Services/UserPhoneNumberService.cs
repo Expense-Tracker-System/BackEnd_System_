@@ -18,6 +18,11 @@ namespace backend_dotnet7.Core.Services
             return Task.FromResult(!_context.Users.Any(u => u.PhoneNumber == phoneNumber));
         }
 
+        public Task<bool> IsPhoneNumberUniqueForUpdate(string phoneNumber, string userId)
+        {
+            return Task.FromResult(!_context.Users.Any(u => u.PhoneNumber == phoneNumber && u.Id != userId));
+        }
+
         public Task<bool> PhoneNumberValidation(string phoneNumber)
         {
             Regex phoneNumberRegex = new Regex(@"^0\d{9}$", RegexOptions.Compiled);

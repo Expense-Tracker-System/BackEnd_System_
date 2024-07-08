@@ -16,14 +16,17 @@ namespace backend_dotnet7.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserPasswordConfirmService _userPasswordConfirmService;
         private readonly IGenerateResponseService _generateResponseService;
+        private readonly ILogService _logService;
 
         public UserPasswordController(UserManager<ApplicationUser> userManager, 
             IUserPasswordConfirmService userPasswordConfirmService,
-            IGenerateResponseService generateResponseService)
+            IGenerateResponseService generateResponseService,
+            ILogService logService)
         {
             _userManager = userManager;
             _userPasswordConfirmService = userPasswordConfirmService;
             _generateResponseService = generateResponseService;
+            _logService = logService;
         }
 
         [HttpPut]
@@ -88,6 +91,8 @@ namespace backend_dotnet7.Controllers
 
                 var roles = await _userManager.GetRolesAsync(isExist);
                 var userInfo = _generateResponseService.GenerateUserInfoAsync(isExist, roles);
+
+                await _logService.SaveNewLog(isExist.UserName, "Update User password");
 
                 return new LoginServiceResponseDto
                 {

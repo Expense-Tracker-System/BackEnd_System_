@@ -1,4 +1,5 @@
-﻿using backend_dotnet7.Core.Constants;
+﻿using backend_dotnet7.Controllers;
+using backend_dotnet7.Core.Constants;
 using backend_dotnet7.Core.Dtos.Auth;
 using backend_dotnet7.Core.Dtos.General;
 using backend_dotnet7.Core.Entities;
@@ -23,6 +24,8 @@ namespace backend_dotnet7.Core.Services
         private readonly IUserEmailService _userEmailService;
         private readonly IUserPhoneNumberService _userPhoneNumberService;
         private readonly IGenerateResponseService _generateResponseService;
+        private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<AuthService> _logger;
 
         public AuthService(UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole> roleManager,
@@ -31,7 +34,9 @@ namespace backend_dotnet7.Core.Services
             IUserPasswordConfirmService userPasswordConfirmService,
             IUserEmailService userEmailService,
             IUserPhoneNumberService userPhoneNumberService,
-            IGenerateResponseService generateResponseService)
+            IGenerateResponseService generateResponseService,
+            IWebHostEnvironment environment,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -41,6 +46,8 @@ namespace backend_dotnet7.Core.Services
             _userEmailService = userEmailService;
             _userPhoneNumberService = userPhoneNumberService;
             _generateResponseService = generateResponseService;
+            _environment = environment;
+            _logger = logger;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -190,11 +197,29 @@ namespace backend_dotnet7.Core.Services
                 return null;
             }
 
+            // check if the user locked out
+            var isLockedOut = await _userManager.IsLockedOutAsync(user);
+
+            if (isLockedOut)
+            {
+                return null;
+            }
+
             //Check password of user
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
             if (!isPasswordCorrect)
             {
+                //increase the locked count
+                await _userManager.AccessFailedAsync(user);
+
+                // check if the user locked out
+                var userStatus = await _userManager.IsLockedOutAsync(user);
+
+                if (userStatus)
+                {
+                    return null;
+                }
                 return null;
             }
 
@@ -314,43 +339,6 @@ namespace backend_dotnet7.Core.Services
                 .ToListAsync();
 
             return userNames;
-        }
-
-        public async Task<LoginServiceResponseDto?> UpdateFirstLastName(UpdateFirstLastNameDto updateFirstLastNameDto)
-        {
-            var isExistsUser = await _userManager.FindByNameAsync(updateFirstLastNameDto.Username);
-
-            if(isExistsUser is null)
-            {
-                return null;
-            }
-
-            isExistsUser.FirstName = updateFirstLastNameDto.FirstName;
-            isExistsUser.LastName = updateFirstLastNameDto.LastName;
-
-            var updateResult = await _userManager.UpdateAsync(isExistsUser);
-
-            if (!updateResult.Succeeded)
-            {
-                return null;
-            }
-
-            // generate new JWT token...
-            var newToken = await _generateResponseService.GenerateJwtTokenAsync(isExistsUser);
-
-            // find user role
-            var roles = await _userManager.GetRolesAsync(isExistsUser);
-
-            //var rolesList = roles.ToList();
-
-            var userInfo = _generateResponseService.GenerateUserInfoAsync(isExistsUser, roles);
-            await _logService.SaveNewLog(isExistsUser.UserName, "New Token Generated");
-
-            return new LoginServiceResponseDto
-            {
-                NewToken = newToken,
-                userInfo = userInfo
-            };
         }
 
     }

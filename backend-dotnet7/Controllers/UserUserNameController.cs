@@ -15,14 +15,17 @@ namespace backend_dotnet7.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserUserNameService _userUserNameService;
         private readonly IGenerateResponseService _generateResponseService;
+        private readonly ILogService _logService;
 
         public UserUserNameController(UserManager<ApplicationUser> userManager, 
             IUserUserNameService userUserNameConfirmService, 
-            IGenerateResponseService generateResponseService)
+            IGenerateResponseService generateResponseService,
+            ILogService logService)
         {
             _userManager = userManager;
             _userUserNameService = userUserNameConfirmService;
             _generateResponseService = generateResponseService;
+            _logService = logService;
         }
 
         [HttpPut]
@@ -69,6 +72,8 @@ namespace backend_dotnet7.Controllers
 
                 var roles = await _userManager.GetRolesAsync(isExist);
                 var userInfo = _generateResponseService.GenerateUserInfoAsync(isExist, roles);
+
+                await _logService.SaveNewLog(isExist.UserName, "Update User Name");
 
                 return new LoginServiceResponseDto
                 {

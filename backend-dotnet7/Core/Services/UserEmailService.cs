@@ -30,5 +30,10 @@ namespace backend_dotnet7.Core.Services
         {
             return Task.FromResult(!_context.Users.Any(u => u.Email == email));
         }
+
+        public Task<bool> IsEmailUniqueForUpdate(string email, string userId)
+        {
+            return Task.FromResult(!_context.Users.Any(u => u.Email == email && u.Id != userId));
+        }
     }
 }

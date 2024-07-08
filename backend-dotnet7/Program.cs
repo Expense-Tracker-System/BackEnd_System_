@@ -104,7 +104,13 @@ builder.Services.AddCors(options =>
 
 //Add Identity
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>()
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        // password lockout
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 3;
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -229,14 +235,14 @@ app.UseCors(options =>
 
 app.UseHttpsRedirection();
 
-/*
+// Access Static Files
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
            Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
     RequestPath = "/Resources"
 });
-*/
+
 
 // Everything
 app.UseCors();
