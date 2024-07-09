@@ -34,7 +34,7 @@ namespace backend_dotnet7.Controllers
                 return Ok(result);
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetSavingDetails")]
         public async Task<IActionResult> GetSavingDetails([FromBody] savingViewrequestDTO request)
         {
