@@ -63,6 +63,36 @@ namespace backend_dotnet7.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SavingViewEntitiess",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Year = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Month = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SavingViewEntitiess", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransactionEntities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Amount = table.Column<double>(type: "float", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    userName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionEntities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -249,6 +279,12 @@ namespace backend_dotnet7.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "SavingViewEntitiess");
+
+            migrationBuilder.DropTable(
+                name: "TransactionEntities");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");
