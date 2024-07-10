@@ -48,7 +48,7 @@ namespace backend_dotnet7.Core.Services
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
                 notBefore: DateTime.Now,
-                expires: DateTime.Now.AddHours(3),
+                expires: DateTime.Now.AddMinutes(1),
                 claims: authClaims,
                 signingCredentials: signingCredentials
                 );
