@@ -170,7 +170,7 @@ namespace backend_dotnet7.Core.Services
                 {
                     IsSucceed = false,
                     StatusCode = 400,
-                    Message = "errorString"
+                    Message = errorString
                 };
             }
 
