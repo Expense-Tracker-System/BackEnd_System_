@@ -6,8 +6,8 @@ namespace backend_dotnet7.Core.Entities
 {
     public class Organization : BaseEntity<long>
     {
-        [Key]
-        public long Id { get; set; }
+        //[Key]
+        //public long Id { get; set; }
         public string? Name { get; set; }
         public int MembersCount { get; set; }
         public double TotalTakeAmount { get; set; }

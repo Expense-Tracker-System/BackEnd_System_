@@ -46,8 +46,8 @@ namespace backend_dotnet7.Controllers
                 DeactivateUserAccount deactivateUserAccount = new DeactivateUserAccount()
                 {
                     UserId = isExist.Id,
-                    Message = deactivateUserAccountDto.Message,
-                    Date = deactivateUserAccountDto.Date
+                    Message = deactivateUserAccountDto.DeactivationReason,
+                    Date = deactivateUserAccountDto.ReactivationDate
                 };
 
                 await _context.DeactivateUserAccounts.AddAsync(deactivateUserAccount);
