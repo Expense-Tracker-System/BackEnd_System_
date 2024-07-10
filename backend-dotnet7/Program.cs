@@ -1,3 +1,4 @@
+using backend_dotnet7.Core.BackgroundJobs;
 using backend_dotnet7.Core.DbContext;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +80,8 @@ builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOutMessageService, OutMessageService>();
 builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAdminsettingService, AdminsettingService>();
 builder.Services.AddScoped<ICreateOrganizationService, CreateOrganizationService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 
@@ -87,6 +91,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IFinancialService, FinancialService>();
 builder.Services.AddScoped<IUserUserNameService, UserUserNameService>();
 builder.Services.AddScoped<IGenerateResponseService, GenerateResponseService>();
+
 
 
 // registers CORS services during service configuration
@@ -188,7 +193,24 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddQuartz(q =>
+{
+    // Use a Scoped container to create jobs.
+    q.UseMicrosoftDependencyInjectionJobFactory();
 
+    var dailyJobKey = new JobKey("DailyJob");
+
+    // Register the daily job with the DI container
+    q.AddJob<DailyJob>(opts => opts.WithIdentity(dailyJobKey));
+
+    // Create a trigger for the daily job to run every day at 12:00 AM
+    q.AddTrigger(opts => opts
+        .ForJob(dailyJobKey) // Link to the DailyJob
+        .WithIdentity("DailyJob-trigger") // Give the trigger a unique name
+        .WithCronSchedule("0 50 16 * * ?"));
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 
 
