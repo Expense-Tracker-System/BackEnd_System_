@@ -7,9 +7,6 @@ namespace backend_dotnet7.Core.DbContext
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> //generic type
     {
-        public ApplicationDbContext()
-        {
-        }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

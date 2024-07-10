@@ -4,5 +4,6 @@
     {
         Task<bool> EmailValidation(string email);
         Task<bool> IsEmailUnique(string email);
+        Task<bool> IsEmailUniqueForUpdate(string email, string userId);
     }
 }

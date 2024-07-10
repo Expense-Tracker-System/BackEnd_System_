@@ -2,7 +2,7 @@
 {
     public class UpdateUserNameDto
     {
-        public string UserName { get; set;}
-        public string NewUserName { get; set; }
+        public string? UserName { get; set;}
+        public string? NewUserName { get; set; }
     }
 }

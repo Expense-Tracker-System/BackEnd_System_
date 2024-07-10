@@ -9,6 +9,6 @@ namespace backend_dotnet7.Core.Entities
         public ApplicationUser? applicationUser { get; set; }
 
         public string? Message { get; set; }
-        public string? Date { get; set; }
+        public DateTime Date { get; set; }
     }
 }

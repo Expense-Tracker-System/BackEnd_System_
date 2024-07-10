@@ -15,17 +15,24 @@ namespace backend_dotnet7.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserPasswordConfirmService _userPasswordConfirmService;
+        private readonly IGenerateResponseService _generateResponseService;
+        private readonly ILogService _logService;
 
-        public UserPasswordController(UserManager<ApplicationUser> userManager, IUserPasswordConfirmService userPasswordConfirmService)
+        public UserPasswordController(UserManager<ApplicationUser> userManager, 
+            IUserPasswordConfirmService userPasswordConfirmService,
+            IGenerateResponseService generateResponseService,
+            ILogService logService)
         {
             _userManager = userManager;
             _userPasswordConfirmService = userPasswordConfirmService;
+            _generateResponseService = generateResponseService;
+            _logService = logService;
         }
 
         [HttpPut]
         [Route("updateUserPassword")]
         [Authorize]
-        public async Task<ActionResult<GeneralServiceResponseDto>> updateUserPassword([FromBody] UpdateUserPasswordDto updateUserPasswordDto)
+        public async Task<ActionResult<LoginServiceResponseDto>> updateUserPasswordAsync([FromBody] UpdateUserPasswordDto updateUserPasswordDto)
         {
             try
             {
@@ -80,11 +87,17 @@ namespace backend_dotnet7.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest, "Update user password is Failed");
                 }
 
-                return new GeneralServiceResponseDto()
+                var newToken = await _generateResponseService.GenerateJwtTokenAsync(isExist);
+
+                var roles = await _userManager.GetRolesAsync(isExist);
+                var userInfo = _generateResponseService.GenerateUserInfoAsync(isExist, roles);
+
+                await _logService.SaveNewLog(isExist.UserName, "Update User password");
+
+                return new LoginServiceResponseDto
                 {
-                    IsSucceed = true,
-                    StatusCode = 200,
-                    Message = "Update User Password Successfully"
+                    NewToken = newToken,
+                    userInfo = userInfo
                 };
 
             } catch(Exception ex)

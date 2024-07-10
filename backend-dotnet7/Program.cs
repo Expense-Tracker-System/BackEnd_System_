@@ -84,9 +84,13 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAdminsettingService, AdminsettingService>();
 builder.Services.AddScoped<ICreateOrganizationService, CreateOrganizationService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
-//atto mapper configaration
+
+//auto mapper configaration
 builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddScoped<IFinancialService, FinancialService>();
+builder.Services.AddScoped<IUserUserNameService, UserUserNameService>();
+builder.Services.AddScoped<IGenerateResponseService, GenerateResponseService>();
 
 
 
@@ -105,7 +109,13 @@ builder.Services.AddCors(options =>
 
 //Add Identity
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>()
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        // password lockout
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 3;
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -115,10 +125,10 @@ builder.Services
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequiredLength = 8;
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
     options.SignIn.RequireConfirmedAccount = false;
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedAccount = false;
@@ -142,9 +152,11 @@ builder.Services
         {
             ValidateIssuer = true,
             ValidateAudience = true,
+            ValidateLifetime = true,
             ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
             ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
+            ClockSkew = TimeSpan.Zero
         };
     });
 
@@ -247,14 +259,14 @@ app.UseCors(options =>
 
 app.UseHttpsRedirection();
 
-/*
+// Access Static Files
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
            Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
     RequestPath = "/Resources"
 });
-*/
+
 
 // Everything
 app.UseCors();
