@@ -116,5 +116,13 @@ namespace backend_dotnet7.Controllers
             return StatusCode(confirmedResult.StatusCode, confirmedResult.Message);
         }
 
+        [HttpPost]
+        [Route("twoFactor")]
+        public async Task<IActionResult> TwoFactor([FromBody] TwoFactorDto twoFactorDto)
+        {
+            var responseResult = await _authService.TwoFactorAsync(twoFactorDto);
+            return StatusCode(responseResult.StatusCode, responseResult);
+        }
+
     }
 }

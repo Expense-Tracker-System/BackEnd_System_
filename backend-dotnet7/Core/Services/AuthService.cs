@@ -165,6 +165,7 @@ namespace backend_dotnet7.Core.Services
                 EmailConfirmed = false,
                 UserName = registerDto.Username,
                 PhoneNumber = registerDto.PhoneNumber,
+                TwoFactorEnabled = false,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
@@ -314,6 +315,11 @@ namespace backend_dotnet7.Core.Services
 
             if(containsRole)
             {
+                if (await _userManager.GetTwoFactorEnabledAsync(user))
+                {
+                    return await _generateResponseService.GenerateOTPFor2Factor(user);
+                }
+
                 //Return Token and userInfo to front-end
                 var NewToken = await _generateResponseService.GenerateJwtTokenAsync(user);
 
@@ -473,6 +479,57 @@ namespace backend_dotnet7.Core.Services
                 IsSucceed = true,
                 StatusCode = 200,
                 Message = "Email Confirmed Successfully"
+            };
+        }
+
+        public async Task<LoginServiceResponseDto> TwoFactorAsync(TwoFactorDto twoFactorDto)
+        {
+            var user = await _userManager.FindByNameAsync(twoFactorDto.userName!);
+
+            if(user is null)
+            {
+                return new LoginServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "Invalid Request",
+                    NewToken = null,
+                    userInfo = null,
+                };
+            }
+
+            var result = await _userManager.VerifyTwoFactorTokenAsync(user, twoFactorDto.provider!, twoFactorDto.token!);
+
+            if(result is false)
+            {
+                return new LoginServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "Token Verification is Failed",
+                    NewToken = null,
+                    userInfo = null,
+                };
+            }
+
+            // find user role
+            var roles = await _userManager.GetRolesAsync(user);
+
+            //Return Token and userInfo to front-end
+            var NewToken = await _generateResponseService.GenerateJwtTokenAsync(user);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
+            await _logService.SaveNewLog(user.UserName, "New Login");
+
+            return new LoginServiceResponseDto()
+            {
+                IsSucceed = true,
+                StatusCode = 201,
+                Message = "Token Verification was Successful & Login was successfull",
+                NewToken = NewToken,
+                userInfo = userInfo
             };
         }
     }

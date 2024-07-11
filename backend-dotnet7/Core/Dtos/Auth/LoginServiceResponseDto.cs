@@ -8,5 +8,7 @@ namespace backend_dotnet7.Core.Dtos.Auth
 
         //This would be return to the front
         public UserInfoResult? userInfo { get; set; }
+        public bool is2FactorRequired { get; set; }
+        public string? provider { get; set; }
     }
 }

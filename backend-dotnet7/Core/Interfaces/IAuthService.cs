@@ -14,5 +14,6 @@ namespace backend_dotnet7.Core.Interfaces
         Task<UserInfoResult?> GetUserDetailsByUserNameAsync(string userName);
         Task<IEnumerable<string>> GetUsernameListAsync();
         Task<GeneralServiceResponseDto> ConfirmEmailAsync(string userId, string code);
+        Task<LoginServiceResponseDto> TwoFactorAsync(TwoFactorDto twoFactorDto);
     }
 }

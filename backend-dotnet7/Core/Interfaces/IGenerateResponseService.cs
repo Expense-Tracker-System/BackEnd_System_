@@ -7,5 +7,6 @@ namespace backend_dotnet7.Core.Interfaces
     {
         Task<string> GenerateJwtTokenAsync(ApplicationUser user);
         UserInfoResult GenerateUserInfoAsync(ApplicationUser user, IEnumerable<string> roles);
+        Task<LoginServiceResponseDto> GenerateOTPFor2Factor(ApplicationUser user);
     }
 }
