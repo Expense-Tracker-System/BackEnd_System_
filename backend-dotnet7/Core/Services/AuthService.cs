@@ -4,12 +4,18 @@ using backend_dotnet7.Core.Dtos.Auth;
 using backend_dotnet7.Core.Dtos.General;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
+using backend_dotnet7.Core.Template;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Policy;
 using System.Text;
 
 namespace backend_dotnet7.Core.Services
@@ -26,6 +32,7 @@ namespace backend_dotnet7.Core.Services
         private readonly IGenerateResponseService _generateResponseService;
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<AuthService> _logger;
+        private readonly IEmailService _emailService;
 
         public AuthService(UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole> roleManager,
@@ -36,7 +43,8 @@ namespace backend_dotnet7.Core.Services
             IUserPhoneNumberService userPhoneNumberService,
             IGenerateResponseService generateResponseService,
             IWebHostEnvironment environment,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -48,6 +56,7 @@ namespace backend_dotnet7.Core.Services
             _generateResponseService = generateResponseService;
             _environment = environment;
             _logger = logger;
+            _emailService = emailService;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -74,7 +83,7 @@ namespace backend_dotnet7.Core.Services
             };
         }
 
-        public async Task<GeneralServiceResponseDto> RegisterAsync(RegisterDto registerDto)
+        public async Task<GeneralServiceResponseDto> RegisterAsync(RegisterDto registerDto, string callback_url)
         {
             var isExistsUser = await _userManager.FindByNameAsync(registerDto.Username);
 
@@ -102,6 +111,7 @@ namespace backend_dotnet7.Core.Services
                     Message = "User Email is invalid"
                 };
 
+            /*
             var isUnique = await _userEmailService.IsEmailUnique(registerDto.Email);
 
             if (isUnique is false)
@@ -113,6 +123,7 @@ namespace backend_dotnet7.Core.Services
                     Message = "Already has account using this Email"
                 };
             }
+            */
 
             var validPhoneNumber = await _userPhoneNumberService.PhoneNumberValidation(registerDto.PhoneNumber);
 
@@ -151,6 +162,7 @@ namespace backend_dotnet7.Core.Services
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
+                EmailConfirmed = false,
                 UserName = registerDto.Username,
                 PhoneNumber = registerDto.PhoneNumber,
                 SecurityStamp = Guid.NewGuid().ToString()
@@ -178,11 +190,33 @@ namespace backend_dotnet7.Core.Services
             await _userManager.AddToRoleAsync(newUser, StaticUserRoles.USER);
             await _logService.SaveNewLog(newUser.UserName, "Registered to Website");
 
+            // Generate Email confirmation Token
+            var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+
+            // Append values
+            var new_callback_url = $"{callback_url}?userId={newUser.Id}&code={Uri.EscapeDataString(emailConfirmationToken)}";
+
+            // Send email
+            var registrationConfirmEmailTemplate = new RegistrationConfirmEmailTemplate();
+            var htmlText = registrationConfirmEmailTemplate.RegistrationConfirmEmail(new_callback_url,newUser.Email);
+            var emailSendResponse = await _emailService.SendEmail(htmlText, registerDto.Email, "Email Confirmation");
+
+            // check response
+            if(emailSendResponse.IsSuccess is false)
+            {
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = true,
+                    StatusCode = 201,
+                    Message = "Register Was Successfull " + emailSendResponse.Message + " Error Occured in Send Mail, Please Contact Admin",
+                };
+            }
+
             return new GeneralServiceResponseDto()
             {
                 IsSucceed = true,
                 StatusCode = 201,
-                Message = "User"
+                Message = "Register Was Successfull " + emailSendResponse.Message + " Please Confirm Your Email",
             };
 
         }
@@ -194,7 +228,27 @@ namespace backend_dotnet7.Core.Services
 
             if (user is null)
             {
-                return null;
+                return new LoginServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 404,
+                    Message = "User not founded",
+                    NewToken = null,
+                    userInfo = null,
+                };
+            }
+
+            // check confirm Email / confirm Account
+            if (!user.EmailConfirmed)
+            {
+                return new LoginServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 403,
+                    Message = "Email not confirmed",
+                    NewToken = null,
+                    userInfo = null,
+                };
             }
 
             // check if the user locked out
@@ -202,7 +256,14 @@ namespace backend_dotnet7.Core.Services
 
             if (isLockedOut)
             {
-                return null;
+                return new LoginServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 423,
+                    Message = "User account is Locked",
+                    NewToken = null,
+                    userInfo = null,
+                };
             }
 
             //Check password of user
@@ -218,9 +279,23 @@ namespace backend_dotnet7.Core.Services
 
                 if (userStatus)
                 {
-                    return null;
+                    return new LoginServiceResponseDto
+                    {
+                        IsSucceed = false,
+                        StatusCode = 423,
+                        Message = "User account is Locked",
+                        NewToken = null,
+                        userInfo = null,
+                    };
                 }
-                return null;
+                return new LoginServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 401,
+                    Message = "Invalid username or password",
+                    NewToken = null,
+                    userInfo = null,
+                };
             }
 
             // find user role
@@ -249,12 +324,22 @@ namespace backend_dotnet7.Core.Services
 
                 return new LoginServiceResponseDto()
                 {
+                    IsSucceed = true,
+                    StatusCode = 201,
+                    Message = "Login was successfull",
                     NewToken = NewToken,
                     userInfo = userInfo
                 };
             }
 
-            return null;
+            return new LoginServiceResponseDto
+            {
+                IsSucceed = false,
+                StatusCode = 401,
+                Message = "Inavalid path",
+                NewToken = null,
+                userInfo = null,
+            };
 
         }
 
@@ -341,5 +426,54 @@ namespace backend_dotnet7.Core.Services
             return userNames;
         }
 
+        public async Task<GeneralServiceResponseDto> ConfirmEmailAsync(string userId, string code)
+        {
+            if(string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(code))
+            {
+                return new GeneralServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "Invalid Email Confirmation Url"
+                };
+            }
+
+            var isExist = await _userManager.FindByIdAsync(userId);
+
+            if(isExist is null)
+            {
+                return new GeneralServiceResponseDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "Invalid Email Parameter"
+                };
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(isExist, code);
+
+            if (!result.Succeeded)
+            {
+                var errorString = "Email Confirmed failed because : ";
+                foreach (var error in result.Errors)
+                {
+                    errorString += " # " + error.Description;
+                }
+
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = errorString
+                };
+            }
+
+            return new GeneralServiceResponseDto
+            {
+                IsSucceed = true,
+                StatusCode = 200,
+                Message = "Email Confirmed Successfully"
+            };
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace backend_dotnet7.Core.Interfaces
+﻿using backend_dotnet7.Core.Entities;
+
+namespace backend_dotnet7.Core.Interfaces
 {
     public interface IUserEmailService
     {

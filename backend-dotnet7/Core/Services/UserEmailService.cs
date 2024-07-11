@@ -1,6 +1,11 @@
 ﻿using backend_dotnet7.Core.DbContext;
+using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
+using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace backend_dotnet7.Core.Services
 {

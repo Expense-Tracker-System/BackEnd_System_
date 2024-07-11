@@ -19,6 +19,8 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using backend_dotnet7.Core.Dtos.Organization;
+using SendGrid.Helpers.Mail;
+using backend_dotnet7.Core.Dtos.Email;
 
 
 
@@ -56,6 +58,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+// Configure Email Setting
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
 //AutoMapper DI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -80,17 +85,17 @@ builder.Services.AddScoped<ICategoryReposatory, CategoryService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOutMessageService, OutMessageService>();
 builder.Services.AddScoped<IUserPhoneNumberService, UserPhoneNumberService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IAdminsettingService, AdminsettingService>();
 builder.Services.AddScoped<ICreateOrganizationService, CreateOrganizationService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
-
-//auto mapper configaration
-builder.Services.AddAutoMapper(typeof(Program));
-
 builder.Services.AddScoped<IFinancialService, FinancialService>();
 builder.Services.AddScoped<IUserUserNameService, UserUserNameService>();
 builder.Services.AddScoped<IGenerateResponseService, GenerateResponseService>();
+
+
+//auto mapper configaration
+builder.Services.AddAutoMapper(typeof(Program));
 
 
 

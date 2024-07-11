@@ -1,12 +1,15 @@
 ﻿using backend_dotnet7.Core.Constants;
 using backend_dotnet7.Core.Dtos.Auth;
 using backend_dotnet7.Core.Interfaces;
+using backend_dotnet7.Core.Template;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 
 namespace backend_dotnet7.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
@@ -30,23 +33,19 @@ namespace backend_dotnet7.Controllers
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var registerResult = await _authService.RegisterAsync(registerDto);
+            var callback_url = Request.Scheme + "://" + Request.Host + Url.Action("ConfirmEmail", "Auth");
+            var registerResult = await _authService.RegisterAsync(registerDto, callback_url);   
             return StatusCode(registerResult.StatusCode, registerResult.Message);
         }
 
         // Route -> Login
         [HttpPost]
         [Route("Login")]
-        public async Task<ActionResult<LoginServiceResponseDto>> Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var loginResult = await _authService.LoginAsync(loginDto);
+            return StatusCode(loginResult.StatusCode, loginResult);
 
-            if (loginResult is null)
-            {
-                return Unauthorized("Your credentials are invalid. Please contact to an Admin");
-            }
-
-            return Ok(loginResult);
         }
 
         // Route -> getting data of a user from it's JWT
@@ -107,6 +106,14 @@ namespace backend_dotnet7.Controllers
         {
             var userNames = await _authService.GetUsernameListAsync();
             return Ok(userNames);
+        }
+
+        [HttpGet]
+        [Route("confirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            var confirmedResult = await _authService.ConfirmEmailAsync(userId,code);
+            return StatusCode(confirmedResult.StatusCode, confirmedResult.Message);
         }
 
     }
