@@ -10,5 +10,6 @@
         public string? UserName { get; set; }
         public DateTime CreatedAt { get; set; }
         public IEnumerable<string>? Roles { get; set; }
+        public bool TwoFactorEnabled { get; set; }
     }
 }

@@ -72,7 +72,8 @@ namespace backend_dotnet7.Core.Services
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 CreatedAt = user.CreatedAt,
-                Roles = roles
+                Roles = roles,
+                TwoFactorEnabled = user.TwoFactorEnabled,
             };
         }
 
