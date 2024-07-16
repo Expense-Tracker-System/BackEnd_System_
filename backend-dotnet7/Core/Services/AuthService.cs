@@ -111,7 +111,6 @@ namespace backend_dotnet7.Core.Services
                     Message = "User Email is invalid"
                 };
 
-            /*
             var isUnique = await _userEmailService.IsEmailUnique(registerDto.Email);
 
             if (isUnique is false)
@@ -123,7 +122,6 @@ namespace backend_dotnet7.Core.Services
                     Message = "Already has account using this Email"
                 };
             }
-            */
 
             var validPhoneNumber = await _userPhoneNumberService.PhoneNumberValidation(registerDto.PhoneNumber);
 

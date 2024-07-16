@@ -10,5 +10,6 @@ namespace backend_dotnet7.Core.Entities
 
         public string? Message { get; set; }
         public DateTime Date { get; set; }
+        public bool IsChecked { get; set; }
     }
 }

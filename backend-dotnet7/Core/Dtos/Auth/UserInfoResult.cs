@@ -11,5 +11,6 @@
         public DateTime CreatedAt { get; set; }
         public IEnumerable<string>? Roles { get; set; }
         public bool TwoFactorEnabled { get; set; }
+        public bool IsDeactivateRequest { get; set; }
     }
 }

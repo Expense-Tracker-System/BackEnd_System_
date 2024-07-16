@@ -14,11 +14,16 @@ namespace backend_dotnet7.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IGenerateResponseService _generateResponseService;
+        private readonly ILogService _logService;
 
-        public TwoFactorAuthenticationController(UserManager<ApplicationUser> userManager, IGenerateResponseService generateResponseService)
+        public TwoFactorAuthenticationController(
+            UserManager<ApplicationUser> userManager, 
+            IGenerateResponseService generateResponseService,
+            ILogService logService)
         {
             _userManager = userManager;
             _generateResponseService = generateResponseService;
+            _logService = logService;
         }
 
         [HttpPut]
@@ -45,6 +50,16 @@ namespace backend_dotnet7.Controllers
                 if (!updateResult.Succeeded)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, "Update 2FA is Failed");
+                }
+
+                if(user.TwoFactorEnabled is true)
+                {
+                    await _logService.SaveNewLog(user.UserName, "Enabled 2FA");
+                }
+
+                if(user.TwoFactorEnabled is false)
+                {
+                    await _logService.SaveNewLog(user.UserName, "Disabled 2FA");
                 }
 
                 // get roles

@@ -12,6 +12,7 @@ namespace backend_dotnet7.Core.Entities
         [NotMapped]
         public IList<string>? Roles { get; set; }
         public string? UserImage { get; set; }
+        public bool IsDeactivateRequest { get; set; }
 
         // navigate -> ICollection is interface / List is concreate class
         public ICollection<Log> logs { get; set; } = new List<Log>();

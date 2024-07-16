@@ -74,6 +74,7 @@ namespace backend_dotnet7.Core.Services
                 CreatedAt = user.CreatedAt,
                 Roles = roles,
                 TwoFactorEnabled = user.TwoFactorEnabled,
+                IsDeactivateRequest = user.IsDeactivateRequest,
             };
         }
 
