@@ -41,9 +41,9 @@ namespace backend_dotnet7.Infrastructure.Services
 
         
         public IEnumerable<TransactionDto> GetTransactions(string userName)
-        {
+            {
             var transactions = _context.TransactionEntities.Where(t => t.userName == userName).Select(t => new TransactionDto
-                {
+            {
                     Id = t.Id,
                     Amount = t.Amount,
                     Description = t.Description,
@@ -53,11 +53,11 @@ namespace backend_dotnet7.Infrastructure.Services
 
             return transactions;
         }
-        
+
         public async Task<bool> DeleteTransaction(int id, string userName)
         {
             var entity = new TransactionEntity
-            {
+        {
                 Id = id,
               
                 userName =userName, // Assign the UserName from DTO

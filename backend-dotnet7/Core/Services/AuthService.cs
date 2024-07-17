@@ -1,4 +1,5 @@
-﻿using backend_dotnet7.Core.Constants;
+﻿using backend_dotnet7.Controllers;
+using backend_dotnet7.Core.Constants;
 using backend_dotnet7.Core.Dtos.Auth;
 using backend_dotnet7.Core.Dtos.General;
 using backend_dotnet7.Core.Entities;
@@ -6,6 +7,7 @@ using backend_dotnet7.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -18,13 +20,34 @@ namespace backend_dotnet7.Core.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogService _logService;
         private readonly IConfiguration _configuration;
+        private readonly IUserPasswordConfirmService _userPasswordConfirmService;
+        private readonly IUserEmailService _userEmailService;
+        private readonly IUserPhoneNumberService _userPhoneNumberService;
+        private readonly IGenerateResponseService _generateResponseService;
+        private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,ILogService logService, IConfiguration configuration)
+        public AuthService(UserManager<ApplicationUser> userManager, 
+            RoleManager<IdentityRole> roleManager,
+            ILogService logService, 
+            IConfiguration configuration, 
+            IUserPasswordConfirmService userPasswordConfirmService,
+            IUserEmailService userEmailService,
+            IUserPhoneNumberService userPhoneNumberService,
+            IGenerateResponseService generateResponseService,
+            IWebHostEnvironment environment,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _logService = logService;
             _configuration = configuration;
+            _userPasswordConfirmService = userPasswordConfirmService;
+            _userEmailService = userEmailService;
+            _userPhoneNumberService = userPhoneNumberService;
+            _generateResponseService = generateResponseService;
+            _environment = environment;
+            _logger = logger;
         }
 
         public async Task<GeneralServiceResponseDto> SeedRolesAsync()
@@ -63,14 +86,73 @@ namespace backend_dotnet7.Core.Services
                     Message = "UserName Alredy Exists"
                 };
 
+            var confirmPasswordDto = new ConfirmPasswordDto
+            {
+                password = registerDto.Password,
+                confirmPassword = registerDto.ConfirmPassword
+            };
+
+            var emailValidationResult = await _userEmailService.EmailValidation(registerDto.Email);
+
+            if (emailValidationResult is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Email is invalid"
+                };
+
+            var isUnique = await _userEmailService.IsEmailUnique(registerDto.Email);
+
+            if (isUnique is false)
+            {
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 409,
+                    Message = "Already has account using this Email"
+                };
+            }
+
+            var validPhoneNumber = await _userPhoneNumberService.PhoneNumberValidation(registerDto.PhoneNumber);
+
+            if (validPhoneNumber is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Phone Number is invalid"
+                };
+
+            var isPhoneNumberUnique = await _userPhoneNumberService.IsPhoneNumberUnique(registerDto.PhoneNumber);
+
+            if (isPhoneNumberUnique is false)
+            {
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 409,
+                    Message = "Already has account using this Phone Number"
+                };
+            }
+
+            var passwordValidationResult = await _userPasswordConfirmService.userPasswordConfirm(confirmPasswordDto);
+
+            if (passwordValidationResult is false)
+                return new GeneralServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "User Password Confirmation is Failed"
+                };
+
             ApplicationUser newUser = new ApplicationUser()
             {
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 UserName = registerDto.Username,
-                Address = registerDto.Address,
-                Roles = "User",
+                PhoneNumber = registerDto.PhoneNumber,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
@@ -88,7 +170,7 @@ namespace backend_dotnet7.Core.Services
                 {
                     IsSucceed = false,
                     StatusCode = 400,
-                    Message = "errorString"
+                    Message = errorString
                 };
             }
 
@@ -115,33 +197,64 @@ namespace backend_dotnet7.Core.Services
                 return null;
             }
 
-            //Find Correct Mode
-//            if(!String.Equals(loginDto.Mode, user.Roles, StringComparison.OrdinalIgnoreCase))
-//{
-//                return null;
-//            }
+            // check if the user locked out
+            var isLockedOut = await _userManager.IsLockedOutAsync(user);
 
+            if (isLockedOut)
+            {
+                return null;
+            }
 
             //Check password of user
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
             if (!isPasswordCorrect)
             {
+                //increase the locked count
+                await _userManager.AccessFailedAsync(user);
+
+                // check if the user locked out
+                var userStatus = await _userManager.IsLockedOutAsync(user);
+
+                if (userStatus)
+                {
+                    return null;
+                }
                 return null;
             }
 
-            //Return Token and userInfo to front-end
-            var NewToken = await GenerateJWTTokenAsync(user);
+            // find user role
             var roles = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, roles);
-            await _logService.SaveNewLog(user.UserName, "New Login");
 
-            return new LoginServiceResponseDto()
+            // check pathname
+            bool containsRole = false;
+            foreach (var role in roles)
             {
-                NewToken = NewToken,
-                userInfo = userInfo
-            };
+                if (loginDto.pathName.Contains(role.ToLower(), StringComparison.OrdinalIgnoreCase))
+                {
+                    containsRole = true;
+                    break;
+                }
+            }
 
+            if(containsRole)
+            {
+                //Return Token and userInfo to front-end
+                var NewToken = await _generateResponseService.GenerateJwtTokenAsync(user);
+
+                //var rolesList = roles.ToList();
+
+                var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
+                await _logService.SaveNewLog(user.UserName, "New Login");
+
+                return new LoginServiceResponseDto()
+                {
+                    NewToken = NewToken,
+                    userInfo = userInfo
+                };
+            }
+
+            return null;
 
         }
 
@@ -164,9 +277,14 @@ namespace backend_dotnet7.Core.Services
             if (user is null)
                 return null;
 
-            var NewToken = await GenerateJWTTokenAsync(user);
+            var NewToken = await _generateResponseService.GenerateJwtTokenAsync(user);
+
+            // find user role
             var roles = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, roles);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
             await _logService.SaveNewLog(user.UserName, "New Token Generated");
 
             return new LoginServiceResponseDto()
@@ -186,8 +304,12 @@ namespace backend_dotnet7.Core.Services
 
             foreach(var user in users)
             {
+                // find user role
                 var roles = await _userManager.GetRolesAsync(user);
-                var userInfo = GenerateUserInfoObject(user, roles);
+
+                //var rolesList = roles.ToList();
+
+                var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
                 userInfoResults.Add(userInfo);
             }
 
@@ -200,8 +322,12 @@ namespace backend_dotnet7.Core.Services
             if (user is null)
                 return null;
 
-            var role = await _userManager.GetRolesAsync(user);
-            var userInfo = GenerateUserInfoObject(user, role);
+            // find user role
+            var roles = await _userManager.GetRolesAsync(user);
+
+            //var rolesList = roles.ToList();
+
+            var userInfo = _generateResponseService.GenerateUserInfoAsync(user, roles);
 
             return userInfo;
         }
@@ -215,66 +341,5 @@ namespace backend_dotnet7.Core.Services
             return userNames;
         }
 
-   
-
-
-
-        //GenerateJWTTokenAsync
-        private async Task<string> GenerateJWTTokenAsync(ApplicationUser user)
-        {
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier,user.Id),
-                new Claim("FirstName",user.FirstName),
-                new Claim("LastName",user.LastName)
-            };
-
-            foreach(var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            }
-
-            //Created Our Own Secret
-            var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-            //Create Credential
-            var signingCredentials = new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256);
-
-            //Create new Token
-            var tokenObject = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                notBefore: DateTime.Now,
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: signingCredentials
-                );
-
-
-            string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
-            return token;
-
-        }
-
-
-
-
-        //GenerateUserInfoObject
-        private UserInfoResult GenerateUserInfoObject(ApplicationUser user, IEnumerable<string> Roles)
-        {
-            return new UserInfoResult()
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName,
-                Email = user.Email,
-                CreatedAt = user.CreatedAt,
-                Roles = user.Roles
-            };
-        }
     }
 }
