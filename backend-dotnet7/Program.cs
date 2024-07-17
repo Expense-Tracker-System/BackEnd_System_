@@ -3,7 +3,7 @@ using backend_dotnet7.Core.DbContext;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
 using backend_dotnet7.Core.Services;
-//using backend_dotnet7.Infrastructure.Services;
+using backend_dotnet7.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -69,6 +69,9 @@ builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ISavingService,SarvingService>();
+
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<IUserImageService, UserImageService>();

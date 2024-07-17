@@ -1,59 +1,89 @@
-﻿using backend_dotnet7.Core.Entities;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using backend_dotnet7.Core.DbContext;
+using backend_dotnet7.Core.Dtos;
+using backend_dotnet7.Core.Dtos.Log;
+using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace backend_dotnet7.Core.Services
+namespace backend_dotnet7.Infrastructure.Services
 {
-    public class TransactionService : ITransactionReposatory
+    public class TransactionService : ITransactionService
     {
-        public Transaction AddTransaction(int CategoryId, Transaction transaction)
+        private readonly ApplicationDbContext _context;
+
+        public TransactionService(ApplicationDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public List<Transaction> AllTransaction(int CategoryId)
+        public async Task<TransactionDto> AddTransaction(string userName, TransactionDto transaction)
         {
-            var transactions = new List<Transaction>();
+            var entity = new TransactionEntity
+            {
+                Id = transaction.Id,
+                Amount = transaction.Amount,
+                Description = transaction.Description,
+                userName = userName,
+            };
 
-            var transaction1 = new Transaction
-            {
-                Id = 1,
-                Amount = 200,
-                Note = "Food Bill",
-                Created = DateTime.Now,
-                Status = TransactionStatus.Completed
+            _context.TransactionEntities.Add(entity);
+            await _context.SaveChangesAsync();
 
-            };
-            transactions.Add(transaction1);
-            var transaction2 = new Transaction
+            return transaction;
+        }
+
+       
+       
+        
+
+        
+        public IEnumerable<TransactionDto> GetTransactions(string userName)
             {
-                Id = 2,
-                Amount = 500,
-                Note = "Water Bill",
-                Created = DateTime.Now,
-                Status = TransactionStatus.Completed
-            };
-            transactions.Add(transaction2);
-            var transaction3 = new Transaction
+            var transactions = _context.TransactionEntities.Where(t => t.userName == userName).Select(t => new TransactionDto
             {
-                Id = 3,
-                Amount = 1000,
-                Note = "Salary",
-                Created = DateTime.Now,
-                Status = TransactionStatus.Completed
-            };
-            transactions.Add(transaction3);
+                    Id = t.Id,
+                    Amount = t.Amount,
+                    Description = t.Description,
+                     // Assuming CreatedAt as Date
+                })
+                .ToList();
 
             return transactions;
         }
 
-        public Transaction GetTransaction(int CategoryId, int id)
+        public async Task<bool> DeleteTransaction(int id, string userName)
         {
-            throw new NotImplementedException();
+            var entity = new TransactionEntity
+        {
+                Id = id,
+              
+                userName =userName, // Assign the UserName from DTO
+            };
+            _context.TransactionEntities.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public void UpdateTransaction(Transaction transaction)
+        public async Task<TransactionEntity> UpdateTransaction( TransactionDto transaction, string userName)
         {
-            throw new NotImplementedException();
+            var existingTransaction = await _context.
+                TransactionEntities.FirstOrDefaultAsync(t => t.Id == transaction.Id && t.userName == userName);
+
+            if (existingTransaction == null)
+                return null;
+
+            existingTransaction.Amount = transaction.Amount;
+            existingTransaction.Description = transaction.Description;
+
+            _context.TransactionEntities.Update(existingTransaction);
+            await _context.SaveChangesAsync();
+
+            return existingTransaction;
         }
+
+       
     }
 }

@@ -1,3 +1,4 @@
+using backend_dotnet7.Core.Dtos;
 using backend_dotnet7.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -14,6 +15,8 @@ namespace backend_dotnet7.Core.DbContext
 
         public DbSet<Log> Logs { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet <TransactionEntity> TransactionEntities { get; set; }
+        public DbSet<SavingViewEntities> SavingViewEntitiess {  get; set; }
         public DbSet<Reminder> Reminders { get; set; }
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<BExpense> BExpenses { get; set; }
