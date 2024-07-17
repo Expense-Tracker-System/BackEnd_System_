@@ -51,7 +51,9 @@ namespace backend_dotnet7.Core.Services
 
             //}).ToListAsync();
 
-            var savingDetails = await context.SavingViewEntitiess.Where(sa => sa.userName == userName && sa.BankName == request.BankName && sa.Date >= request.StartDate && sa.Date <= request.EndDate).Select(sa=> new savingViewDTO(sa.Id,sa.Amount,sa.BankName,sa.Date,sa.userName)).ToListAsync();
+            var savingDetails = await context.SavingViewEntitiess.Where
+                (sa => sa.userName == userName && sa.BankName == request.BankName && sa.Date >= request.StartDate && sa.Date <= request.EndDate).Select
+                (sa=> new savingViewDTO(sa.Id,sa.Amount,sa.BankName,sa.Date, sa.Description,sa.userName)).ToListAsync();
             return savingDetails;
 
         }

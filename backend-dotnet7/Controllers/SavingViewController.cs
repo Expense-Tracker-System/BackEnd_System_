@@ -34,14 +34,14 @@ namespace backend_dotnet7.Controllers
                 return Ok(result);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetSavingDetails")]
         public async Task<IActionResult> GetSavingDetails([FromBody] savingViewrequestDTO request)
         {
             try
             {
                 //var userName = User.Identity.Name;
-                var userName = User.Identity.Name;
+                var userName = "menaka";
                 var reuslt = await _srvingService.GetSavingDetails(userName, request);
                 return Ok(reuslt);
             }
