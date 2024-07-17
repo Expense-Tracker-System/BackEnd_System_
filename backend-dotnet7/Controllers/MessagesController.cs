@@ -45,11 +45,48 @@ namespace backend_dotnet7.Controllers
 
         //Route -> Get All Messages With Admine Access
         [HttpGet]
+        [Route("getAllMessage")]
         [Authorize(Roles = StaticUserRoles.ADMIN)]
         public async Task<ActionResult<IEnumerable<GetMessageDto>>> GetMessages()
         {
             var messages = await _messageService.GetMessagesAsync();
             return Ok(messages);
+        }
+
+        [HttpGet]
+        [Route("getStartedDateAndEndDateOfSystemMessage")]
+        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        public async Task<ActionResult<GetStartedDateAnsEndDateMessageDto>> GetStartedDateAndEndDateOfSystemMessage()
+        {
+            var startedDate = await _messageService.GetStartedDateAndEndDateOfSystemMessageAsync();
+            return Ok(startedDate);
+        }
+
+        [HttpPost]
+        [Route("searchMesagesByDateRange")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<GetMessageDto>>> SearchMessagesByDateRange([FromBody] SearchMessagesByDateRangeDto searchMessagesByDateRangeDto)
+        {
+            var result = await _messageService.SearchMessagesByDateRangeAsync(searchMessagesByDateRangeDto);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("getStartedDateAndEndDateOfMyMessage")]
+        [Authorize]
+        public async Task<ActionResult<GetStartedDateAnsEndDateMessageDto>> GetStartedDateAndEndDateOfMyMessage()
+        {
+            var result = await _messageService.GetStartedDateAndEndDateOfMyMessageAsync(User);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("searchMyMesagesByDateRange")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<GetMessageDto>>> SearchMyMesagesByDateRange([FromBody] SearchMessagesByDateRangeDto searchMessagesByDateRangeDto)
+        {
+            var result = await _messageService.SearchMyMessagesByDateRangeAsync(searchMessagesByDateRangeDto, User);
+            return Ok(result);
         }
     }
 }

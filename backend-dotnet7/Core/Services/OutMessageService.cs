@@ -1,5 +1,6 @@
 ﻿using backend_dotnet7.Core.DbContext;
 using backend_dotnet7.Core.Dtos.General;
+using backend_dotnet7.Core.Dtos.Message;
 using backend_dotnet7.Core.Dtos.OutMessage;
 using backend_dotnet7.Core.Entities;
 using backend_dotnet7.Core.Interfaces;
@@ -75,6 +76,70 @@ namespace backend_dotnet7.Core.Services
                 .ToListAsync();
 
             return outMessage;
+        }
+
+        public async Task<GetStartedDateAnsEndDateMessageDto> GetStartedDateAndEndDateOfOutMessageAsync()
+        {
+            if(!await _context.OutMessages.AnyAsync())
+            {
+                return new GetStartedDateAnsEndDateMessageDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 404,
+                    Message = "Not Started the Out Message Service",
+                    StartDate = null,
+                    EndDate = null,
+                };
+            }
+
+            var startedDate = await _context.OutMessages
+                .OrderBy(om => om.Created)
+                .Select(om => om.Created)
+                .FirstOrDefaultAsync();
+
+            var endDate = await _context.OutMessages
+                .OrderByDescending(om => om.Created)
+                .Select(om => om.Created)
+                .FirstOrDefaultAsync();
+
+            if (startedDate == null || endDate == null)
+            {
+                return new GetStartedDateAnsEndDateMessageDto
+                {
+                    IsSucceed = false,
+                    StatusCode = 400,
+                    Message = "Started date or End date can't be null",
+                    StartDate = startedDate,
+                    EndDate = endDate,
+                };
+            }
+
+            return new GetStartedDateAnsEndDateMessageDto
+            {
+                IsSucceed = true,
+                StatusCode = 200,
+                Message = "Started the Message Sercice",
+                StartDate = startedDate,
+                EndDate = endDate,
+            };
+        }
+
+        public async Task<IEnumerable<GetOutMessageDto>> SearchOutMessagesByDateRangeAsync(SearchMessagesByDateRangeDto searchMessagesByDateRangeDto)
+        {
+            var outMessages = await _context.OutMessages
+                .Where(q => q.Created >= searchMessagesByDateRangeDto.FromDate && q.Created <= searchMessagesByDateRangeDto.AdjustedToDate)
+                .Select(q => new GetOutMessageDto()
+                {
+                    Id = q.Id,
+                    OutUserEmail = q.OutUserEmail,
+                    Text = q.Text,
+                    IsChecked = q.IsChecked,
+                    Created = q.Created,
+                })
+                .OrderByDescending(q => q.Created)
+                .ToListAsync();
+
+            return outMessages;
         }
     }
 }

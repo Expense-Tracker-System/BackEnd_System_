@@ -1,4 +1,6 @@
-﻿namespace backend_dotnet7.Core.Dtos.Message
+﻿using backend_dotnet7.Core.Dtos.General;
+
+namespace backend_dotnet7.Core.Dtos.Message
 {
     public class GetMessageDto
     {

@@ -9,6 +9,9 @@ namespace backend_dotnet7.Core.Interfaces
         Task<GeneralServiceResponseDto> CreateNewMessageAsync(ClaimsPrincipal User, CreateMessageDto createMessageDto);
         Task<IEnumerable<GetMessageDto>> GetMessagesAsync();
         Task<IEnumerable<GetMessageDto>> GetMyMessagesAsync(ClaimsPrincipal User);
-
+        Task<IEnumerable<GetMessageDto>> SearchMessagesByDateRangeAsync(SearchMessagesByDateRangeDto searchMessagesByDateRangeDto);
+        Task<GetStartedDateAnsEndDateMessageDto> GetStartedDateAndEndDateOfSystemMessageAsync();
+        Task<GetStartedDateAnsEndDateMessageDto> GetStartedDateAndEndDateOfMyMessageAsync(ClaimsPrincipal User);
+        Task<IEnumerable<GetMessageDto>> SearchMyMessagesByDateRangeAsync(SearchMessagesByDateRangeDto searchMessagesByDateRangeDto, ClaimsPrincipal User);
     }
 }
